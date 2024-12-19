@@ -1,0 +1,50 @@
+/gamemode creative
+/summon civiliansmod:civilian
+/gamemode survival
+/give @s civiliansmod:villager_to_npc_potion
+/gamemode creative
+/summon civiliansmod:transformation_jutsu
+/gamemode survival
+/summon civiliansmod:transformation_jutsu
+/give @s civiliansmod:villager_to_npc_potion
+/gamemode creative
+/summon civiliansmod:transformation_jutsu
+/time set day
+/summon civiliansmod:transformation_jutsu
+/gamemode creative
+/weather clear 100000
+/summon civiliansmod:transformation_jutsu
+/time set day
+/summon civiliansmod:transformation_jutsu
+/time set day
+/summon civiliansmod:transformation_jutsu
+/summon minecraft:player
+/summon civiliansmod:transformation_jutsu
+/summon
+/summon civiliansmod:transformation_jutsu
+/summon
+/summon civiliansmod:transformation_jutsu
+/time set day
+/summon
+/summon civiliansmod:transformation_jutsu
+/give @s civiliansmod:villager_to_npc_potion
+/summon civiliansmod:npc
+/time set day
+/summon minecraft:zombie
+/summon minecraft:creeper
+/summon civiliansmod:npc
+/time set day
+/summon civiliansmod:npc
+/gamerule doDaylightCycle false
+/gamerule doWeatherCycle false
+/weather clear
+/time set day
+/summon civiliansmod:npc
+/kill @a
+/summon civiliansmod:npc
+/kill @a
+/summon civiliansmod:npc
+/summon civiliansmod:npcs
+/summon civiliansmod:npc
+/summon civiliansmod:npc\
+/summon civiliansmod:npc

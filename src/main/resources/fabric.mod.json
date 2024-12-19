@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "civiliansmod",
+  "name": "Civilians Mod",
+  "version": "1.0.0",
+
+  "description": "A client-side Minecraft mod introducing civilians.",
+  "authors": [
+    "YourName"
+  ],
+  "contact": {
+    "homepage": "https://your.mod.website",
+    "sources": "https://github.com/your-repo"
+  },
+  "license": "MIT",
+
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "net.asian.civiliansmod.CiviliansMod"
+    ],
+    "client": [
+      "net.asian.civiliansmod.CiviliansModClient"
+    ]
+  },
+
+  "depends": {
+    "fabricloader": ">=0.16.9",
+    "minecraft": "1.21.1",
+    "fabric-api": "0.110.0+1.21.1"
+  }
+}

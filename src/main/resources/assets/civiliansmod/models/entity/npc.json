@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:biped",
+  "textures": {
+    "layer0": "civiliansmod:textures/entity/npc.png"
+  }
+}

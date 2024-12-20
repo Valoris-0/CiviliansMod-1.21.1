@@ -9,7 +9,6 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
 public class NPCRenderer extends MobEntityRenderer<NPCEntity, NPCModel<NPCEntity>> {
-
     // Single texture path
     private static final Identifier TEXTURE = Identifier.of("civiliansmod", "textures/entity/npc/npc_4.png");
 
@@ -41,7 +40,7 @@ public class NPCRenderer extends MobEntityRenderer<NPCEntity, NPCModel<NPCEntity
 
     @Override
     protected void scale(NPCEntity entity, MatrixStack matrices, float amount) {
-        float scale = .95F; // Default to normal scaling
+        float scale = .945F; // Default to normal scaling
         matrices.scale(scale, scale, scale);
 
         super.scale(entity, matrices, amount); // Call parent scale method

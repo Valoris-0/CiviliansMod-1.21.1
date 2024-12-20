@@ -32,8 +32,20 @@ public class NPCModel<T extends LivingEntity> extends PlayerEntityModel<T> {
         );
 
         // Ear and Cloak parts (empty placeholders for now)
-        root.addChild("ear", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
-        root.addChild("cloak", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+        root.addChild(
+                "ear",
+                ModelPartBuilder.create()
+                        .uv(24, 0)
+                        .cuboid(-6.0F, -10.0F, -1.0F, 2.0F, 4.0F, 1.0F), // Vanilla ear geometry
+                ModelTransform.pivot(0.0F, 0.0F, 0.0F)
+        );
+        root.addChild(
+                "cloak",
+                ModelPartBuilder.create()
+                        .uv(0, 0)
+                        .cuboid(-5.0F, 0.0F, -1.0F, 10.0F, 16.0F, 1.0F), // Vanilla cloak dimensions
+                ModelTransform.pivot(0.0F, 0.0F, 0.0F)
+        );
 
         // Body
         root.addChild(
@@ -87,7 +99,7 @@ public class NPCModel<T extends LivingEntity> extends PlayerEntityModel<T> {
                 "right_sleeve",
                 ModelPartBuilder.create()
                         .uv(40, 32)
-                        .cuboid(-3.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F),
+                        .cuboid(-3.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new Dilation(0.25F)),
                 ModelTransform.pivot(-5.0F, 2.0F, 0.0F)
         );
 
@@ -96,7 +108,7 @@ public class NPCModel<T extends LivingEntity> extends PlayerEntityModel<T> {
                 ModelPartBuilder.create()
                         .uv(40, 32)
                         .mirrored()
-                        .cuboid(-1.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F),
+                        .cuboid(-1.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new Dilation(0.25F)),
                 ModelTransform.pivot(5.0F, 2.0F, 0.0F)
         );
 
@@ -105,7 +117,7 @@ public class NPCModel<T extends LivingEntity> extends PlayerEntityModel<T> {
                 "right_pants",
                 ModelPartBuilder.create()
                         .uv(0, 48)
-                        .cuboid(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F),
+                        .cuboid(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new Dilation(0.25F)),
                 ModelTransform.pivot(-1.9F, 12.0F, 0.0F)
         );
 
@@ -114,7 +126,7 @@ public class NPCModel<T extends LivingEntity> extends PlayerEntityModel<T> {
                 ModelPartBuilder.create()
                         .uv(0, 48)
                         .mirrored()
-                        .cuboid(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F),
+                        .cuboid(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F, new Dilation(0.25F)),
                 ModelTransform.pivot(1.9F, 12.0F, 0.0F)
         );
 

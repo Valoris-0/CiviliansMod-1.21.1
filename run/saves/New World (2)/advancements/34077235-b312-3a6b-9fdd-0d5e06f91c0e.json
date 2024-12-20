@@ -59,12 +59,6 @@
     },
     "done": true
   },
-  "minecraft:adventure/adventuring_time": {
-    "criteria": {
-      "minecraft:plains": "2024-12-18 22:18:10 -0600"
-    },
-    "done": false
-  },
   "minecraft:recipes/decorations/barrel": {
     "criteria": {
       "has_planks": "2024-12-18 22:18:09 -0600"
@@ -76,6 +70,12 @@
       "has_planks": "2024-12-18 22:18:09 -0600"
     },
     "done": true
+  },
+  "minecraft:adventure/adventuring_time": {
+    "criteria": {
+      "minecraft:plains": "2024-12-18 22:18:10 -0600"
+    },
+    "done": false
   },
   "DataVersion": 3955
 }

@@ -1,5 +1,3 @@
-/gamemode creative
-/summon civiliansmod:civilian
 /gamemode survival
 /give @s civiliansmod:villager_to_npc_potion
 /gamemode creative
@@ -45,6 +43,8 @@
 /kill @a
 /summon civiliansmod:npc
 /summon civiliansmod:npcs
+/summon civiliansmod:npc
+/summon civiliansmod:npc\
 /summon civiliansmod:npc
 /summon civiliansmod:npc\
 /summon civiliansmod:npc

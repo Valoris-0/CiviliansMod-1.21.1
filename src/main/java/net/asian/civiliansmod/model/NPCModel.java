@@ -31,7 +31,7 @@ public class NPCModel<T extends LivingEntity> extends PlayerEntityModel<T> {
                 ModelTransform.pivot(0.0F, 0.0F, 0.0F)
         );
 
-        // Ear and Cloak parts (empty)
+        // Ear and Cloak parts (empty placeholders for now)
         root.addChild("ear", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
         root.addChild("cloak", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
 
@@ -82,16 +82,50 @@ public class NPCModel<T extends LivingEntity> extends PlayerEntityModel<T> {
                 ModelTransform.pivot(1.9F, 12.0F, 0.0F)
         );
 
-        // Right and Left Sleeves (empty placeholders for now)
-        root.addChild("right_sleeve", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
-        root.addChild("left_sleeve", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+        // Right and Left Sleeves
+        root.addChild(
+                "right_sleeve",
+                ModelPartBuilder.create()
+                        .uv(40, 32)
+                        .cuboid(-3.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F),
+                ModelTransform.pivot(-5.0F, 2.0F, 0.0F)
+        );
 
-        // Pants (empty placeholder for now)
-        root.addChild("right_pants", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
-        root.addChild("left_pants", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+        root.addChild(
+                "left_sleeve",
+                ModelPartBuilder.create()
+                        .uv(40, 32)
+                        .mirrored()
+                        .cuboid(-1.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F),
+                ModelTransform.pivot(5.0F, 2.0F, 0.0F)
+        );
 
-        // Jacket (empty placeholder for now)
-        root.addChild("jacket", ModelPartBuilder.create(), ModelTransform.pivot(0.0F, 0.0F, 0.0F));
+        // Pants
+        root.addChild(
+                "right_pants",
+                ModelPartBuilder.create()
+                        .uv(0, 48)
+                        .cuboid(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F),
+                ModelTransform.pivot(-1.9F, 12.0F, 0.0F)
+        );
+
+        root.addChild(
+                "left_pants",
+                ModelPartBuilder.create()
+                        .uv(0, 48)
+                        .mirrored()
+                        .cuboid(-2.0F, 0.0F, -2.0F, 4.0F, 12.0F, 4.0F),
+                ModelTransform.pivot(1.9F, 12.0F, 0.0F)
+        );
+
+        // Jacket
+        root.addChild(
+                "jacket",
+                ModelPartBuilder.create()
+                        .uv(16, 32)
+                        .cuboid(-4.0F, 0.0F, -2.0F, 8.0F, 12.0F, 4.0F, new Dilation(0.25F)),
+                ModelTransform.pivot(0.0F, 0.0F, 0.0F)
+        );
 
         return TexturedModelData.of(modelData, 64, 64);
     }

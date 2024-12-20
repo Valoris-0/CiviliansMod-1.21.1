@@ -11,7 +11,7 @@ import net.minecraft.util.Identifier;
 public class NPCRenderer extends MobEntityRenderer<NPCEntity, NPCModel<NPCEntity>> {
 
     // Single texture path
-    private static final Identifier TEXTURE = Identifier.of("civiliansmod", "textures/entity/npc/npc_2.png");
+    private static final Identifier TEXTURE = Identifier.of("civiliansmod", "textures/entity/npc/npc_4.png");
 
     // Entity model layer definition
     public static final EntityModelLayer ENTITY_MODEL_LAYER =
@@ -41,7 +41,7 @@ public class NPCRenderer extends MobEntityRenderer<NPCEntity, NPCModel<NPCEntity
 
     @Override
     protected void scale(NPCEntity entity, MatrixStack matrices, float amount) {
-        float scale = 1.0F; // Default to normal scaling
+        float scale = .95F; // Default to normal scaling
         matrices.scale(scale, scale, scale);
 
         super.scale(entity, matrices, amount); // Call parent scale method

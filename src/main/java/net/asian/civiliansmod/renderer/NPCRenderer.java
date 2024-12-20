@@ -9,23 +9,28 @@ import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 
 public class NPCRenderer extends MobEntityRenderer<NPCEntity, NPCModel<NPCEntity>> {
-    // Single texture path
-    private static final Identifier TEXTURE = Identifier.of("civiliansmod", "textures/entity/npc/npc_4.png");
-
     // Entity model layer definition
     public static final EntityModelLayer ENTITY_MODEL_LAYER =
             new EntityModelLayer(Identifier.of("civiliansmod", "npc"), "main");
 
-    // Class-level context for reuse
-    private final EntityRendererFactory.Context context;
-
+    // Constructor
     public NPCRenderer(EntityRendererFactory.Context context) {
         super(context, createModel(context), 0.5F); // Default shadow size of 0.5
-        this.context = context; // Save the context for later use
     }
 
     /**
-     * Dynamically creates the NPC model, always using non-slim arms.
+     * Fetch and return the texture for the specified NPC entity.
+     */
+    @Override
+    public Identifier getTexture(NPCEntity entity) {
+        int variant = entity.getVariant(); // Fetch the variant from the entity
+        return variant == 0
+                ? Identifier.of("civiliansmod", "textures/entity/npc/variant_0.png")
+                : Identifier.of("civiliansmod", "textures/entity/npc/variant_1.png");
+    }
+
+    /**
+     * Creates the NPC model dynamically.
      * @param context Renderer factory context.
      * @return The NPCModel instance.
      */
@@ -33,16 +38,18 @@ public class NPCRenderer extends MobEntityRenderer<NPCEntity, NPCModel<NPCEntity
         return new NPCModel<>(context.getPart(ENTITY_MODEL_LAYER));
     }
 
-    @Override
-    public Identifier getTexture(NPCEntity entity) {
-        return TEXTURE; // Always return a static texture
-    }
-
+    /**
+     * Adjust scaling for the NPC entity before rendering.
+     */
     @Override
     protected void scale(NPCEntity entity, MatrixStack matrices, float amount) {
-        float scale = .945F; // Default to normal scaling
+        float scale = switch (entity.getVariant()) {
+            case 0 -> 0.945F;
+            case 1 -> 0.945F;
+            default -> 0.945F; // Default for new variants
+        };
         matrices.scale(scale, scale, scale);
 
-        super.scale(entity, matrices, amount); // Call parent scale method
+        super.scale(entity, matrices, amount);
     }
 }

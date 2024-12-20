@@ -1,6 +1,6 @@
 package net.asian.civiliansmod.entity;
 
-import net.minecraft.command.argument.EntityAnchorArgumentType;
+import net.minecraft.client.network.DataQueryHandler;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.goal.WanderAroundFarGoal;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -8,12 +8,23 @@ import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 
 public class NPCEntity extends PathAwareEntity {
+    // Step 1: Add a DataTracker entry for the variant
+    private static final TrackedData<Integer> VARIANT = DataTracker.registerData
+            (NPCEntity.class,
+                    TrackedDataHandlerRegistry.INTEGER
+            );
+
     private float targetYaw = 0.0F; // The yaw to smoothly rotate towards
     private boolean isTurning = false; // Whether the NPC is currently in the process of turning
 
@@ -29,6 +40,38 @@ public class NPCEntity extends PathAwareEntity {
         String randomName = names[this.random.nextInt(names.length)];
         this.setCustomName(Text.literal(randomName)); // CustomName gets persisted
         this.setCustomNameVisible(true); // Makes the name always visible above the NPC
+    }
+
+    @Override
+    protected void initDataTracker(DataTracker.Builder builder) {
+        super.initDataTracker(builder); // Pass the builder to the superclass
+
+        // Use the builder to register your custom tracked data
+        builder.add(VARIANT, 0);
+    }
+
+    public int getVariant() {
+        return this.dataTracker.get(VARIANT);
+    }
+
+    public void setVariant(int variant) {
+        this.dataTracker.set(VARIANT, variant);
+    }
+
+    @Override
+    public void writeCustomDataToNbt(NbtCompound nbt) {
+        super.writeCustomDataToNbt(nbt);
+        nbt.putInt("Variant", this.getVariant());
+    }
+
+    @Override
+    public void readCustomDataFromNbt(NbtCompound nbt) {
+        super.readCustomDataFromNbt(nbt);
+        if (nbt.contains("Variant")) {
+            this.setVariant(nbt.getInt("Variant"));
+        } else {
+            this.setVariant(this.random.nextInt(2)); // Randomize if missing
+        }
     }
 
     public static DefaultAttributeContainer.Builder createAttributes() {
@@ -153,4 +196,7 @@ public class NPCEntity extends PathAwareEntity {
         }
         return degrees;
     }
+
+
+
 }

@@ -25,8 +25,8 @@ public class NPCRenderer extends MobEntityRenderer<NPCEntity, NPCModel<NPCEntity
     public Identifier getTexture(NPCEntity entity) {
         int variant = entity.getVariant(); // Fetch the variant from the entity
         return variant == 0
-                ? Identifier.of("civiliansmod", "textures/entity/npc/variant_0.png")
-                : Identifier.of("civiliansmod", "textures/entity/npc/variant_1.png");
+                ? Identifier.of("civiliansmod", "textures/entity/npc/variant_0_default.png")
+                : Identifier.of("civiliansmod", "textures/entity/npc/variant_1_default.png");
     }
 
     /**
@@ -53,3 +53,4 @@ public class NPCRenderer extends MobEntityRenderer<NPCEntity, NPCModel<NPCEntity
         super.scale(entity, matrices, amount);
     }
 }
+

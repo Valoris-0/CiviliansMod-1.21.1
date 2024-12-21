@@ -1,16 +1,3 @@
-/gamemode survival
-/give @s civiliansmod:villager_to_npc_potion
-/gamemode creative
-/summon civiliansmod:transformation_jutsu
-/gamemode survival
-/summon civiliansmod:transformation_jutsu
-/give @s civiliansmod:villager_to_npc_potion
-/gamemode creative
-/summon civiliansmod:transformation_jutsu
-/time set day
-/summon civiliansmod:transformation_jutsu
-/gamemode creative
-/weather clear 100000
 /summon civiliansmod:transformation_jutsu
 /time set day
 /summon civiliansmod:transformation_jutsu
@@ -46,5 +33,18 @@
 /summon civiliansmod:npc
 /summon civiliansmod:npc\
 /summon civiliansmod:npc
+/summon civiliansmod:npc\
+/summon civiliansmod:npc
+/time set night
+/time set midnight
+/gamemode survival
+/gamemode creative
+/time set day
+/time set midnight
+/time set day
+/time set night
+/time set midnight
+/time set day
+/time set night
 /summon civiliansmod:npc\
 /summon civiliansmod:npc

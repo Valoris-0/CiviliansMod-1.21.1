@@ -1,0 +1,32 @@
+{
+  "display": {
+    "icon": {
+      "item": "civiliansmod:npctotem"
+    },
+    "title": {
+      "translate": "advancement.civiliansmod.npctotem_craft.title"
+    },
+    "description": {
+      "translate": "advancement.civiliansmod.npctotem_craft.description"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "crafted_npctotem": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "item": "civiliansmod:npctotem"
+          }
+        ]
+      }
+    }
+  },
+  "rewards": {
+    "experience": 25
+  }
+}

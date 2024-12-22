@@ -1,22 +1,3 @@
-/summon civiliansmod:transformation_jutsu
-/summon
-/summon civiliansmod:transformation_jutsu
-/time set day
-/summon
-/summon civiliansmod:transformation_jutsu
-/give @s civiliansmod:villager_to_npc_potion
-/summon civiliansmod:npc
-/time set day
-/summon minecraft:zombie
-/summon minecraft:creeper
-/summon civiliansmod:npc
-/time set day
-/summon civiliansmod:npc
-/gamerule doDaylightCycle false
-/gamerule doWeatherCycle false
-/weather clear
-/time set day
-/summon civiliansmod:npc
 /kill @a
 /summon civiliansmod:npc
 /kill @a
@@ -48,3 +29,22 @@
 /summon civiliansmod:npc
 /summon civiliansmod:npcs
 /summon civiliansmod:npc
+/kill @a
+/gamemode creative
+/enchant @s minecraft:sharpness 4
+/summon civiliansmod:npc
+/give @s civiliansmod:npctotem
+/locate structure minecraft:village_desert
+/locate structure minecraft:village_plains
+/locate structure minecraft:village_savanna
+/locate structure minecraft:village_
+/locate structure minecraft:village_plains
+/give @s civiliansmod:npctotem
+/place structure minecraft:village_plains
+/loot insert 17 -60 177 loot minecraft:chests/village/village_armorer
+/datapack list
+/loot insert -9 -60 6 loot minecraft:chests/village/village_armorer
+/give @s redstone
+/recipe give @s
+/recipe give @s *
+/advancement grant @a only civiliansmod:npctotem_craft

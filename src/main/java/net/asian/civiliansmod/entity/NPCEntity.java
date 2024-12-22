@@ -30,23 +30,34 @@ public class NPCEntity extends PathAwareEntity {
     public NPCEntity(EntityType<? extends PathAwareEntity> entityType, World world) {
         super(entityType, world);
 
-        // Assign a random name when the NPC is spawned
-        String[] names = {
-                "Charles", "Evelyn", "Sarah", "James", "Henry",
-                "Olivia", "Emma", "Liam", "Mia", "Noah"
-        };
+        if (!this.getWorld().isClient) { // Server-side variant assignment
+            // Randomly assign the variant (0–2 = default, 3–5 = slim)
+            int variant = this.random.nextInt(6);
+            this.setVariant(variant); // Update DataTracker value with assigned variant
 
-        String randomName = names[this.random.nextInt(names.length)];
-        this.setCustomName(Text.literal(randomName)); // CustomName gets persisted
-        this.setCustomNameVisible(true); // Makes the name always visible above the NPC
+            // Assign default model and slim model names to the entity
+            String[] defaultModelNames = { "Charles", "Cade", "Henry", "Liam", "Rodney" };
+            String[] slimModelNames = { "Evelyn", "Sarah", "Olivia", "Emma", "Alexia" };
+
+            if (variant >= 0 && variant <= 2) {  // Default models: Variants 0, 1, 2
+                String randomName = defaultModelNames[this.random.nextInt(defaultModelNames.length)];
+                this.setCustomName(Text.literal(randomName));
+                System.out.println("Assigned 'default' name: " + randomName + " to variant: " + variant);
+            } else if (variant >= 3 && variant <= 5) {  // Slim models: Variants 3, 4, 5
+                String randomName = slimModelNames[this.random.nextInt(slimModelNames.length)];
+                this.setCustomName(Text.literal(randomName));
+                System.out.println("Assigned 'slim' name: " + randomName + " to variant: " + variant);
+            }
+
+            this.setCustomNameVisible(true);  // Ensure name is visible
+        }
     }
+
 
     @Override
     protected void initDataTracker(DataTracker.Builder builder) {
-        super.initDataTracker(builder); // Pass the builder to the superclass
-
-        // Use the builder to register your custom tracked data
-        builder.add(VARIANT, 0);
+        super.initDataTracker(builder);
+        builder.add(VARIANT, 0); // Default initialized to variant 0
     }
 
     // Getter for the variant
@@ -67,18 +78,29 @@ public class NPCEntity extends PathAwareEntity {
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
+
+        // Save the variant
         nbt.putInt("Variant", this.getVariant());
+
+        // Save the custom name if it exists
+        if (this.hasCustomName()) {
+            nbt.putString("CustomName", this.getCustomName().getString());
+        }
     }
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
 
-        // Load variant from NBT or randomize if missing
+        // Load the variant if it exists
         if (nbt.contains("Variant")) {
-            this.setVariant(nbt.getInt("Variant"));
-        } else {
-            this.setVariant(new Random().nextInt(6)); // Randomize, 6 = total variants (default + slim)
+            this.setVariant(nbt.getInt("Variant")); // Persist variant on reload
+        }
+
+        // Load the custom name if it exists
+        if (nbt.contains("CustomName")) {
+            this.setCustomName(Text.literal(nbt.getString("CustomName")));
+
         }
     }
 

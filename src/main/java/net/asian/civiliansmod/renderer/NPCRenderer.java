@@ -15,23 +15,28 @@ public class NPCRenderer extends MobEntityRenderer<NPCEntity, NPCModel<NPCEntity
     public static final EntityModelLayer SLIM_ENTITY_MODEL_LAYER =
             new EntityModelLayer(Identifier.of("civiliansmod", "npc_slim"), "main");
 
-    // Store the EntityRendererFactory.Context in a private field for later use
-    private final EntityRendererFactory.Context rendererContext;
+    // Cached models for performance
+    private final NPCModel<NPCEntity> defaultModel;
+    private final NPCModel<NPCEntity> slimModel;
 
     // Constructor
     public NPCRenderer(EntityRendererFactory.Context context) {
-        super(context, createModel(context, false), 0.5F); // Default shadow size of 0.5
-        this.rendererContext = context; // Save the context for later use
+        // Set the default model and shadow size
+        super(context, new NPCModel<>(context.getPart(DEFAULT_ENTITY_MODEL_LAYER), false), 0.5F);
+
+        // Cache both default and slim models for reuse
+        this.defaultModel = new NPCModel<>(context.getPart(DEFAULT_ENTITY_MODEL_LAYER), false);
+        this.slimModel = new NPCModel<>(context.getPart(SLIM_ENTITY_MODEL_LAYER), true);
     }
 
     /**
-     * Fetches and returns the appropriate texture for the NPCEntity.
+     * Dynamically assigns the appropriate texture based on the NPC's variant.
      */
     @Override
     public Identifier getTexture(NPCEntity entity) {
-        int variant = entity.getVariant(); // Fetch the variant to select texture
+        int variant = entity.getVariant();
 
-        // Assign textures for default and slim models
+        // Map variants to textures
         return switch (variant) {
             case 0 -> Identifier.of("civiliansmod", "textures/entity/npc/default/default_0.png");
             case 1 -> Identifier.of("civiliansmod", "textures/entity/npc/default/default_1.png");
@@ -44,40 +49,30 @@ public class NPCRenderer extends MobEntityRenderer<NPCEntity, NPCModel<NPCEntity
     }
 
     /**
-     * Creates the model dynamically based on whether the entity uses a slim variant or not.
-     *
-     * @param context RendererFactory context
-     * @param slim    Whether the model is slim or default (true = slim)
-     * @return A new NPCModel instance
+     * Adjusts the rendering model (default vs slim) dynamically based on the entity's variant.
      */
-    private static NPCModel<NPCEntity> createModel(EntityRendererFactory.Context context, boolean slim) {
-        return new NPCModel<>(context.getPart(slim ? SLIM_ENTITY_MODEL_LAYER : DEFAULT_ENTITY_MODEL_LAYER), slim);
+    @Override
+    public void render(
+            NPCEntity entity,
+            float entityYaw,
+            float partialTicks,
+            MatrixStack matrices,
+            net.minecraft.client.render.VertexConsumerProvider vertexConsumers,
+            int light) {
+        // Determine the model to use based on variant (slim = variants 3–5)
+        this.model = entity.isSlim() ? slimModel : defaultModel;
+
+        // Render the entity using the selected model
+        super.render(entity, entityYaw, partialTicks, matrices, vertexConsumers, light);
     }
 
     /**
-     * Adjusts the scaling for the NPC entity before rendering.
+     * Scales the NPC entity slightly for both slim and default models.
      */
     @Override
     protected void scale(NPCEntity entity, MatrixStack matrices, float amount) {
-        float scale = 0.945F; // Consistent scaling for both slim and default models
+        float scale = 0.945F; // Uniform scaling for consistency
         matrices.scale(scale, scale, scale);
-
         super.scale(entity, matrices, amount);
-    }
-
-    /**
-     * Overridden render method to dynamically assign the slim or default model.
-     * This ensures the correct model type is used based on the texture selected.
-     */
-    @Override
-    public void render(NPCEntity entity, float entityYaw, float partialTicks, MatrixStack matrices,
-                       net.minecraft.client.render.VertexConsumerProvider vertexConsumers, int light) {
-        // Determine if the entity uses a slim model (variants 3, 4, 5 are slim)
-        boolean slim = entity.getVariant() >= 3 && entity.getVariant() <= 5;
-
-        // Use the rendererContext field to access the context and create the appropriate model
-        this.model = createModel(this.rendererContext, slim);
-
-        super.render(entity, entityYaw, partialTicks, matrices, vertexConsumers, light);
     }
 }

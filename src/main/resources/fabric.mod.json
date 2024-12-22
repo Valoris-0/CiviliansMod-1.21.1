@@ -18,6 +18,7 @@
   "entrypoints": {
     "main": [
       "net.asian.civiliansmod.CiviliansMod"
+
     ],
     "client": [
       "net.asian.civiliansmod.CiviliansModClient"

@@ -10,10 +10,13 @@ import net.minecraft.entity.SpawnGroup;
 import net.minecraft.registry.Registries;
 import net.minecraft.registry.Registry;
 import net.minecraft.util.Identifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class CiviliansMod implements ModInitializer {
 
     public static final String MOD_ID = "civiliansmod"; // Unique mod ID
-
+    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID); // Initialize Logger
     // Registering NPC Entity
     public static final EntityType<NPCEntity> NPC_ENTITY = Registry.register(
             Registries.ENTITY_TYPE, // Use updated 'Registries.ENTITY_TYPE'

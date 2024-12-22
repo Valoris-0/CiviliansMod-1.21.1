@@ -1,29 +1,28 @@
 package net.asian.civiliansmod.entity;
 
-import net.minecraft.client.network.DataQueryHandler;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.goal.WanderAroundFarGoal;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import java.util.Random;
 
 public class NPCEntity extends PathAwareEntity {
-    // Step 1: Add a DataTracker entry for the variant
-    private static final TrackedData<Integer> VARIANT = DataTracker.registerData
-            (NPCEntity.class,
-                    TrackedDataHandlerRegistry.INTEGER
-            );
+    // DataTracker key for the variant
+    private static final TrackedData<Integer> VARIANT = DataTracker.registerData(
+            NPCEntity.class,
+            TrackedDataHandlerRegistry.INTEGER
+    );
 
     private float targetYaw = 0.0F; // The yaw to smoothly rotate towards
     private boolean isTurning = false; // Whether the NPC is currently in the process of turning
@@ -50,12 +49,19 @@ public class NPCEntity extends PathAwareEntity {
         builder.add(VARIANT, 0);
     }
 
+    // Getter for the variant
     public int getVariant() {
         return this.dataTracker.get(VARIANT);
     }
 
+    // Setter for the variant
     public void setVariant(int variant) {
         this.dataTracker.set(VARIANT, variant);
+    }
+
+    // Helper method to determine if the current variant is slim
+    public boolean isSlim() {
+        return this.getVariant() >= 3 && this.getVariant() <= 5;
     }
 
     @Override
@@ -67,10 +73,12 @@ public class NPCEntity extends PathAwareEntity {
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
         super.readCustomDataFromNbt(nbt);
+
+        // Load variant from NBT or randomize if missing
         if (nbt.contains("Variant")) {
             this.setVariant(nbt.getInt("Variant"));
         } else {
-            this.setVariant(this.random.nextInt(2)); // Randomize if missing
+            this.setVariant(new Random().nextInt(6)); // Randomize, 6 = total variants (default + slim)
         }
     }
 
@@ -185,9 +193,7 @@ public class NPCEntity extends PathAwareEntity {
         }
     }
 
-    // Helper method to normalize yaw angle differences
     private float wrapDegrees(float degrees) {
-        // Ensure the yaw stays within the range [-180, 180]
         while (degrees >= 180.0F) {
             degrees -= 360.0F;
         }
@@ -196,7 +202,4 @@ public class NPCEntity extends PathAwareEntity {
         }
         return degrees;
     }
-
-
-
 }

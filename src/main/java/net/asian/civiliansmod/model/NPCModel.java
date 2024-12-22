@@ -5,12 +5,18 @@ import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.entity.LivingEntity;
 
 public class NPCModel<T extends LivingEntity> extends PlayerEntityModel<T> {
+    private final boolean slim;
 
-    public NPCModel(ModelPart root) {
-        super(root, false); // Always uses the default Steve model (not slim)
+    public NPCModel(ModelPart root, boolean slim) {
+        super(root, slim); // Automatically uses the slim parameter for arms
+        this.slim = slim;
     }
 
     public static TexturedModelData getTexturedModelData() {
+        return getTexturedModelData(false); // Default to non-slim model
+    }
+
+    public static TexturedModelData getTexturedModelData(boolean slim) {
         ModelData modelData = new ModelData();
         ModelPartData root = modelData.getRoot();
 
@@ -59,7 +65,11 @@ public class NPCModel<T extends LivingEntity> extends PlayerEntityModel<T> {
         // Right Arm
         root.addChild(
                 "right_arm",
-                ModelPartBuilder.create()
+                slim
+                        ? ModelPartBuilder.create()
+                        .uv(40, 16)
+                        .cuboid(-2.0F, -2.0F, -2.0F, 3.0F, 12.0F, 4.0F)
+                        : ModelPartBuilder.create()
                         .uv(40, 16)
                         .cuboid(-3.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F),
                 ModelTransform.pivot(-5.0F, 2.0F, 0.0F)
@@ -68,7 +78,11 @@ public class NPCModel<T extends LivingEntity> extends PlayerEntityModel<T> {
         // Left Arm
         root.addChild(
                 "left_arm",
-                ModelPartBuilder.create()
+                slim
+                        ? ModelPartBuilder.create()
+                        .uv(32, 48)
+                        .cuboid(-1.0F, -2.0F, -2.0F, 3.0F, 12.0F, 4.0F)
+                        : ModelPartBuilder.create()
                         .uv(40, 16)
                         .mirrored()
                         .cuboid(-1.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F),
@@ -97,7 +111,11 @@ public class NPCModel<T extends LivingEntity> extends PlayerEntityModel<T> {
         // Right and Left Sleeves
         root.addChild(
                 "right_sleeve",
-                ModelPartBuilder.create()
+                slim
+                        ? ModelPartBuilder.create()
+                        .uv(40, 32)
+                        .cuboid(-2.0F, -2.0F, -2.0F, 3.0F, 12.0F, 4.0F, new Dilation(0.25F))
+                        : ModelPartBuilder.create()
                         .uv(40, 32)
                         .cuboid(-3.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new Dilation(0.25F)),
                 ModelTransform.pivot(-5.0F, 2.0F, 0.0F)
@@ -105,7 +123,11 @@ public class NPCModel<T extends LivingEntity> extends PlayerEntityModel<T> {
 
         root.addChild(
                 "left_sleeve",
-                ModelPartBuilder.create()
+                slim
+                        ? ModelPartBuilder.create()
+                        .uv(48, 48)
+                        .cuboid(-1.0F, -2.0F, -2.0F, 3.0F, 12.0F, 4.0F, new Dilation(0.25F))
+                        : ModelPartBuilder.create()
                         .uv(40, 32)
                         .mirrored()
                         .cuboid(-1.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new Dilation(0.25F)),

@@ -1,12 +1,4 @@
 /summon civiliansmod:transformation_jutsu
-/time set day
-/summon civiliansmod:transformation_jutsu
-/time set day
-/summon civiliansmod:transformation_jutsu
-/summon minecraft:player
-/summon civiliansmod:transformation_jutsu
-/summon
-/summon civiliansmod:transformation_jutsu
 /summon
 /summon civiliansmod:transformation_jutsu
 /time set day
@@ -47,4 +39,12 @@
 /time set day
 /time set night
 /summon civiliansmod:npc\
+/summon civiliansmod:npc
+/gamemode creative
+/gamerule doWeatherCycle false
+/gamerule doDaylightCycle false
+/gamemode survival
+/give @s minecraft:diamond_sword
+/summon civiliansmod:npc
+/summon civiliansmod:npcs
 /summon civiliansmod:npc

@@ -63,7 +63,7 @@ public class NPCConversionHandler {
         NPCEntity npcEntity = CiviliansMod.NPC_ENTITY.create(world);
 
         if (npcEntity != null) {
-            
+
             npcEntity.refreshPositionAndAngles(villager.getX(), villager.getY(), villager.getZ(), villager.getYaw(), villager.getPitch());
 
             // Copy over relevant villager properties

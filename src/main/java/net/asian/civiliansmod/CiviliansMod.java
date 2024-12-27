@@ -31,7 +31,7 @@ public class CiviliansMod implements ModInitializer {
         // Register default attributes for the NPC Entity
         FabricDefaultAttributeRegistry.register(NPC_ENTITY, NPCEntity.createAttributes());
         ModItems.registerModItems();
-
+        NPCConversionHandler.register();
         System.out.println("[CiviliansMod] NPC Entity has been registered successfully!");
     }
 }

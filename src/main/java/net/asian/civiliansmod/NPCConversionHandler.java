@@ -36,7 +36,7 @@ public class NPCConversionHandler {
                     if (heldItem.isOf(ModItems.NPC_TOTEM)) {
                         // Perform conversion logic
                         if (world instanceof ServerWorld serverWorld) {
-                            convertVillagerToNPC(villager, serverWorld);
+                            convertVillagerToNPC(villager, serverWorld, player);
 
                             // Decrement the NPC Totem item by 1
                             if (!player.isCreative()) {
@@ -58,7 +58,7 @@ public class NPCConversionHandler {
         return ActionResult.PASS; // Let other interactions proceed
     }
 
-    private static void convertVillagerToNPC(VillagerEntity villager, ServerWorld world) {
+    private static void convertVillagerToNPC(VillagerEntity villager, ServerWorld world, net.minecraft.entity.player.PlayerEntity player) {
         // Create a new instance of NPCEntity
         NPCEntity npcEntity = CiviliansMod.NPC_ENTITY.create(world);
 
@@ -90,8 +90,11 @@ public class NPCConversionHandler {
 
             // Add the new NPC to the world
             world.spawnEntity(npcEntity);
+            player.sendMessage(
+                    net.minecraft.text.Text.literal("Villager has been successfully converted into an NPC!"),
+                    true // Show the message in the action bar
+            );
         } else {
-            // Provide feedback to the player if something goes wrong (e.g., spawning fails)
             System.err.println("Failed to convert Villager to NPCEntity!");
         }
     }

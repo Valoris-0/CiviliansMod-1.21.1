@@ -1,0 +1,10 @@
+{
+  "npc_conversion": {
+    "sounds": [
+      {
+        "name": "civiliansmod:npc_conversion_sound",
+        "stream": false
+      }
+    ]
+  }
+}

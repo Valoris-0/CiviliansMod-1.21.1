@@ -15,7 +15,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.world.World;
-import java.util.Random;
+import net.asian.civiliansmod.gui.CustomNPCScreen;
+import net.minecraft.client.MinecraftClient;
 
 public class NPCEntity extends PathAwareEntity {
     // DataTracker key for the variant
@@ -37,13 +38,13 @@ public class NPCEntity extends PathAwareEntity {
 
             // Assign default model and slim model names to the entity
             String[] defaultModelNames = { "Charles", "Cade", "Henry", "Liam", "Rodney", "Nathaniel", "Elliot", "Julian", "Malcolm", "Tobias", "Wesley", "Felix", "Desmond", "Simon", "Miles", "Everett", "Dorian", "Quentin", "Cedric", "Adrian", "Roman", "Marcus", "Gideon", "Levi", "Jasper" };
-            String[] slimModelNames = { "Evelyn", "Sarah", "Olivia", "Emma", "Alexia", "Amelia", "Celeste", "Lillian", "Evelyn", "Rosalie", "Clara", "Vivienne", "Elena", "Margot", "Nora", "Daphne", "Fiona", "Genevieve", "Juliette", "Lucille", "Naomi", "Ivy", "Serena", "Vera", "Adelaide" };
+            String[] slimModelNames = { "Evelyn", "Sarah", "Olivia", "Emma", "Alexia", "Amelia", "Celeste", "Lillian", "Joleen", "Rosalie", "Clara", "Vivienne", "Elena", "Margot", "Nora", "Daphne", "Fiona", "Genevieve", "Juliette", "Lucille", "Naomi", "Ivy", "Serena", "Vera", "Adelaide" };
 
-            if (variant >= 0 && variant <= 25) {  // Default models: Variants 0, 1, 2
+            if (variant >= 0 && variant <= 25) {  // Default models: Variants 0–25
                 String randomName = defaultModelNames[this.random.nextInt(defaultModelNames.length)];
                 this.setCustomName(Text.literal(randomName));
                 System.out.println("Assigned 'default' name: " + randomName + " to variant: " + variant);
-            } else if (variant >= 26 && variant <= 51) {  // Slim models: Variants 3, 4, 5
+            } else if (variant >= 26 && variant <= 51) {  // Slim models: Variants 26–51
                 String randomName = slimModelNames[this.random.nextInt(slimModelNames.length)];
                 this.setCustomName(Text.literal(randomName));
                 System.out.println("Assigned 'slim' name: " + randomName + " to variant: " + variant);
@@ -52,7 +53,6 @@ public class NPCEntity extends PathAwareEntity {
             this.setCustomNameVisible(true);  // Ensure name is visible
         }
     }
-
 
     @Override
     protected void initDataTracker(DataTracker.Builder builder) {
@@ -72,7 +72,7 @@ public class NPCEntity extends PathAwareEntity {
 
     // Helper method to determine if the current variant is slim
     public boolean isSlim() {
-        return this.getVariant() >= 3 && this.getVariant() <= 5;
+        return this.getVariant() >= 26 && this.getVariant() <= 51;
     }
 
     @Override
@@ -100,7 +100,6 @@ public class NPCEntity extends PathAwareEntity {
         // Load the custom name if it exists
         if (nbt.contains("CustomName")) {
             this.setCustomName(Text.literal(nbt.getString("CustomName")));
-
         }
     }
 
@@ -155,35 +154,45 @@ public class NPCEntity extends PathAwareEntity {
 
     @Override
     protected ActionResult interactMob(PlayerEntity player, Hand hand) {
-        if (!this.getWorld().isClient() && hand == Hand.MAIN_HAND) {
-            // Stop wandering when interacting
-            this.getNavigation().stop();
+        // Ensure the interaction is in the main hand
+        if (hand == Hand.MAIN_HAND) {
+            // Check if the player is sneaking
+            if (player.isSneaking()) {
+                // Only proceed on the client side
+                if (this.getWorld().isClient) {
+                    MinecraftClient.getInstance().setScreen(new CustomNPCScreen(this));
+                }
+                return ActionResult.SUCCESS; // Indicate the interaction was handled
+            }
 
-            // Calculate the target yaw (angle toward the player)
-            double dx = player.getX() - this.getX();
-            double dz = player.getZ() - this.getZ();
-            targetYaw = (float) (Math.atan2(dz, dx) * (180F / Math.PI)) - 90F; // Store target yaw
-            isTurning = true; // Start the turning process
+            // (Optional) Normal interaction behavior if not sneaking
+            if (!this.getWorld().isClient()) {
+                this.getNavigation().stop();
 
-            // Handle interaction dialogue
-            Text nameText = this.getCustomName();
-            String npcName = nameText != null ? nameText.getString() : "NPC"; // Retrieve the NPC's name
+                double dx = player.getX() - this.getX();
+                double dz = player.getZ() - this.getZ();
+                targetYaw = (float) (Math.atan2(dz, dx) * (180F / Math.PI)) - 90F;
+                isTurning = true;
 
-            String[] dialogues = {
-                    "Hello there, traveler! How can I help you?",
-                    "I hope you're enjoying the day.",
-                    "Stay safe—the world is dangerous.",
-                    "There's treasure hidden nearby... or so I've heard.",
-                    "Don't forget to stay out of trouble!"
-            };
+                Text nameText = this.getCustomName();
+                String npcName = nameText != null ? nameText.getString() : "NPC";
 
-            String dialogue = dialogues[this.random.nextInt(dialogues.length)]; // Random dialogue
-            player.sendMessage(Text.literal(npcName + ": " + dialogue)); // Send message to the player
+                String[] dialogues = {
+                        "Hello there, traveler! How can I help you?",
+                        "I hope you're enjoying the day.",
+                        "Stay safe—the world is dangerous.",
+                        "There's treasure hidden nearby... or so I've heard.",
+                        "Don't forget to stay out of trouble!"
+                };
 
-            return ActionResult.SUCCESS; // Successful interaction
+                String dialogue = dialogues[this.random.nextInt(dialogues.length)];
+                player.sendMessage(Text.literal(npcName + ": " + dialogue));
+            }
+            return ActionResult.SUCCESS;
         }
 
-        return super.interactMob(player, hand); // Let other interactions occur
+        // Delegate to superclass for other interactions
+        return super.interactMob(player, hand);
     }
 
     @Override

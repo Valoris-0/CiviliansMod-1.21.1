@@ -32,18 +32,18 @@ public class NPCEntity extends PathAwareEntity {
 
         if (!this.getWorld().isClient) { // Server-side variant assignment
             // Randomly assign the variant (0–2 = default, 3–5 = slim)
-            int variant = this.random.nextInt(6);
+            int variant = this.random.nextInt(53);
             this.setVariant(variant); // Update DataTracker value with assigned variant
 
             // Assign default model and slim model names to the entity
             String[] defaultModelNames = { "Charles", "Cade", "Henry", "Liam", "Rodney" };
             String[] slimModelNames = { "Evelyn", "Sarah", "Olivia", "Emma", "Alexia" };
 
-            if (variant >= 0 && variant <= 2) {  // Default models: Variants 0, 1, 2
+            if (variant >= 0 && variant <= 25) {  // Default models: Variants 0, 1, 2
                 String randomName = defaultModelNames[this.random.nextInt(defaultModelNames.length)];
                 this.setCustomName(Text.literal(randomName));
                 System.out.println("Assigned 'default' name: " + randomName + " to variant: " + variant);
-            } else if (variant >= 3 && variant <= 5) {  // Slim models: Variants 3, 4, 5
+            } else if (variant >= 26 && variant <= 51) {  // Slim models: Variants 3, 4, 5
                 String randomName = slimModelNames[this.random.nextInt(slimModelNames.length)];
                 this.setCustomName(Text.literal(randomName));
                 System.out.println("Assigned 'slim' name: " + randomName + " to variant: " + variant);

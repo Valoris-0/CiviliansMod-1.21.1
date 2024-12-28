@@ -1,4 +1,3 @@
-/summon civiliansmod:npc
 /kill @a
 /summon civiliansmod:npc
 /summon civiliansmod:npcs
@@ -48,3 +47,4 @@
 /recipe give @s *
 /advancement grant @a only civiliansmod:npctotem_craft
 /playsound civiliansmod:npc_conversion
+/summon civiliansmod:npc

@@ -1,6 +1,9 @@
 package net.asian.civiliansmod.gui;
 
 import net.asian.civiliansmod.entity.NPCEntity;
+import net.asian.civiliansmod.networking.NPCDataPayload;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -22,9 +25,7 @@ public class CustomNPCScreen extends Screen {
     private static final int ENTITY_PREVIEW_SIZE = 20; // Downscaled preview
     private static final int ENTITY_SPACING = 60;     // Adjusted spacing
     private static final int COLUMN_WIDTH = 130;
-    private static final int SCROLL_STEP = 15;
     private int selectedVariant = -1; // No variant is selected by default
-    // Scroll bar variables
     private int scrollOffset = 0;  // Current scroll offset
     private int maxScrollOffset;  // Maximum allowed scroll offset
     private boolean isScrolling = false; // True if currently dragging the scrollbar
@@ -56,6 +57,7 @@ public class CustomNPCScreen extends Screen {
             String inputName = nameInputField.getText();
             if (!inputName.isEmpty()) {
                 npc.setCustomName(Text.literal(inputName));
+                npc.writeCustomDataToNbt(npc.writeNbt(new NbtCompound()));
             }
         }).dimensions(this.width / 2 - 50, 70, 100, 20).build());
 
@@ -75,6 +77,19 @@ public class CustomNPCScreen extends Screen {
         updateScrollBarDimensions();
     }
 
+    @Override
+    public void close() {
+        if (MinecraftClient.getInstance().player != null) {
+
+            NPCDataPayload payload = new NPCDataPayload(
+                    npc.getUuid(),
+                    nameInputField.getText(),
+                    npc.getVariant()
+            );
+            ClientPlayNetworking.send(payload);
+        }
+        super.close();
+    }
     private void updateScrollBarDimensions() {
         int scrollBarTotalHeight = this.height - 100; // Available height for the scroll bar track
         float visiblePercentage = (float) (this.height - 100) / ((this.maxScrollOffset + this.height - 100)); // Ratio of visible content
@@ -168,26 +183,17 @@ public class CustomNPCScreen extends Screen {
             if (clickedVariant != -1) {
                 this.selectedVariant = clickedVariant;
                 this.npc.setVariant(clickedVariant); // Update NPC variant immediately
+                npc.writeCustomDataToNbt(npc.writeNbt(new NbtCompound()));
 
                 // Save changes to ensure they persist
-                saveNPCChanges();
+
             }
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
-    private void saveNPCChanges() {
-        if (npc != null) {
-            // Create a new NBT compound to store changes
-            NbtCompound nbt = new NbtCompound();
-            npc.writeCustomDataToNbt(nbt); // Save NPC state to this NBT data
 
-            // Debugging - optional
-            System.out.println("Saved NPC Changes to NBT: " + nbt);
-
-        }
-    }
     private int detectClickedVariant(double mouseX, double mouseY, int panelX, boolean isDefault) {
         int startVariantIndex = isDefault ? 0 : 26;
         int endVariantIndex = isDefault ? 25 : 51;

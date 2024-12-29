@@ -82,12 +82,15 @@ public class NPCEntity extends PathAwareEntity {
     }
 
     @Override
+    public boolean cannotDespawn() {
+        return true; // Prevents the entity from despawning
+    }
+    @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
 
         // Save the variant to NBT
         nbt.putInt("Variant", this.getVariant());
-        System.out.println("[SAVE] Writing Variant to NBT: " + this.getVariant());
         // Save the custom name to NBT
         if (this.hasCustomName()) {
             nbt.putString("CustomName", this.getCustomName().getString());
@@ -102,8 +105,6 @@ public class NPCEntity extends PathAwareEntity {
         if (nbt.contains("Variant")) {
             this.setVariant(nbt.getInt("Variant")); // Load custom variant from NBT
 
-            // Debug log for testing
-            System.out.println("[LOAD] Loading Variant from NBT: " + this.getVariant());
         }
 
         // Load the custom name from NBT, if exists

@@ -8,6 +8,7 @@ import net.minecraft.client.gui.widget.ButtonWidget;
 import net.minecraft.client.gui.widget.TextFieldWidget;
 import net.minecraft.client.render.entity.EntityRenderDispatcher;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.RotationAxis;
 import net.minecraft.world.World;
@@ -166,13 +167,27 @@ public class CustomNPCScreen extends Screen {
 
             if (clickedVariant != -1) {
                 this.selectedVariant = clickedVariant;
-                this.npc.setVariant(clickedVariant); // Update the NPC variant immediately
+                this.npc.setVariant(clickedVariant); // Update NPC variant immediately
+
+                // Save changes to ensure they persist
+                saveNPCChanges();
             }
         }
 
         return super.mouseClicked(mouseX, mouseY, button);
     }
 
+    private void saveNPCChanges() {
+        if (npc != null) {
+            // Create a new NBT compound to store changes
+            NbtCompound nbt = new NbtCompound();
+            npc.writeCustomDataToNbt(nbt); // Save NPC state to this NBT data
+
+            // Debugging - optional
+            System.out.println("Saved NPC Changes to NBT: " + nbt);
+
+        }
+    }
     private int detectClickedVariant(double mouseX, double mouseY, int panelX, boolean isDefault) {
         int startVariantIndex = isDefault ? 0 : 26;
         int endVariantIndex = isDefault ? 25 : 51;
@@ -347,4 +362,5 @@ public class CustomNPCScreen extends Screen {
 
         matrices.pop();
     }
+
 }

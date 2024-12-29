@@ -20,11 +20,9 @@ public class CiviliansModClient implements ClientModInitializer {
     public void onInitializeClient() {
         // Register the renderer for the entity
         EntityRendererRegistry.register(CiviliansMod.NPC_ENTITY, NPCRenderer::new);
-
         // Register BOTH model layers with the correct TexturedModelData
         EntityModelLayerRegistry.registerModelLayer(DEFAULT_ENTITY_MODEL_LAYER, () -> NPCModel.getTexturedModelData(false));
         EntityModelLayerRegistry.registerModelLayer(SLIM_ENTITY_MODEL_LAYER, () -> NPCModel.getTexturedModelData(true));
-
         CiviliansMod.LOGGER.info("[CiviliansMod] Model layers registered!");
     }
 }

@@ -40,11 +40,11 @@ public class NPCEntity extends PathAwareEntity {
             String[] defaultModelNames = { "Charles", "Cade", "Henry", "Liam", "Rodney", "Nathaniel", "Elliot", "Julian", "Malcolm", "Tobias", "Wesley", "Felix", "Desmond", "Simon", "Miles", "Everett", "Dorian", "Quentin", "Cedric", "Adrian", "Roman", "Marcus", "Gideon", "Levi", "Jasper" };
             String[] slimModelNames = { "Evelyn", "Sarah", "Olivia", "Emma", "Alexia", "Amelia", "Celeste", "Lillian", "Joleen", "Rosalie", "Clara", "Vivienne", "Elena", "Margot", "Nora", "Daphne", "Fiona", "Genevieve", "Juliette", "Lucille", "Naomi", "Ivy", "Serena", "Vera", "Adelaide" };
 
-            if (variant >= 0 && variant <= 25) {  // Default models: Variants 0–25
+            if (variant >= 0 && variant <= 25) {  // Default models: Variants 0, 1, 2
                 String randomName = defaultModelNames[this.random.nextInt(defaultModelNames.length)];
                 this.setCustomName(Text.literal(randomName));
                 System.out.println("Assigned 'default' name: " + randomName + " to variant: " + variant);
-            } else if (variant >= 26 && variant <= 51) {  // Slim models: Variants 26–51
+            } else if (variant >= 26 && variant <= 51) {  // Slim models: Variants 3, 4, 5
                 String randomName = slimModelNames[this.random.nextInt(slimModelNames.length)];
                 this.setCustomName(Text.literal(randomName));
                 System.out.println("Assigned 'slim' name: " + randomName + " to variant: " + variant);
@@ -53,6 +53,7 @@ public class NPCEntity extends PathAwareEntity {
             this.setCustomNameVisible(true);  // Ensure name is visible
         }
     }
+
 
     @Override
     protected void initDataTracker(DataTracker.Builder builder) {
@@ -70,6 +71,11 @@ public class NPCEntity extends PathAwareEntity {
         this.dataTracker.set(VARIANT, variant);
     }
 
+    public void setCustomName(Text name) {
+        super.setCustomName(name); // Call super to update name
+        // This ensures the name change is tracked and saved
+    }
+
     // Helper method to determine if the current variant is slim
     public boolean isSlim() {
         return this.getVariant() >= 26 && this.getVariant() <= 51;
@@ -79,25 +85,28 @@ public class NPCEntity extends PathAwareEntity {
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
 
-        // Save the variant
+        // Save the variant to NBT
         nbt.putInt("Variant", this.getVariant());
-
-        // Save the custom name if it exists
+        System.out.println("[SAVE] Writing Variant to NBT: " + this.getVariant());
+        // Save the custom name to NBT
         if (this.hasCustomName()) {
             nbt.putString("CustomName", this.getCustomName().getString());
+        } else {
+            nbt.remove("CustomName"); // Clear old data if no name exists
         }
     }
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
-        super.readCustomDataFromNbt(nbt);
-
-        // Load the variant if it exists
+        super.readCustomDataFromNbt(nbt); // Call parent to load standard entity data
         if (nbt.contains("Variant")) {
-            this.setVariant(nbt.getInt("Variant")); // Persist variant on reload
+            this.setVariant(nbt.getInt("Variant")); // Load custom variant from NBT
+
+            // Debug log for testing
+            System.out.println("[LOAD] Loading Variant from NBT: " + this.getVariant());
         }
 
-        // Load the custom name if it exists
+        // Load the custom name from NBT, if exists
         if (nbt.contains("CustomName")) {
             this.setCustomName(Text.literal(nbt.getString("CustomName")));
         }

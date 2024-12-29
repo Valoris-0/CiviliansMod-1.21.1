@@ -13,6 +13,7 @@ import net.minecraft.util.Identifier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
 public class CiviliansMod implements ModInitializer {
 
     public static final String MOD_ID = "civiliansmod"; // Unique mod ID
@@ -33,5 +34,6 @@ public class CiviliansMod implements ModInitializer {
         ModItems.registerModItems();
         NPCConversionHandler.register();
         System.out.println("[CiviliansMod] NPC Entity has been registered successfully!");
+
     }
 }

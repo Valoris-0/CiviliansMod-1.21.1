@@ -26,7 +26,8 @@ public class CiviliansMod implements ModInitializer {
     public static final EntityType<NPCEntity> NPC_ENTITY = Registry.register(
             Registries.ENTITY_TYPE,
             Identifier.of(MOD_ID, "npc"),
-            FabricEntityTypeBuilder.create(SpawnGroup.CREATURE, NPCEntity::new) //
+            FabricEntityTypeBuilder
+                    .create(SpawnGroup.CREATURE, NPCEntity::new) //
                     .dimensions(EntityDimensions.changing(0.6f, 1.8f))
                     .build()
     );

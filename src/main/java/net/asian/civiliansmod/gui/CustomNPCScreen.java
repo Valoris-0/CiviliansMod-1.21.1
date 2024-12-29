@@ -42,6 +42,7 @@ public class CustomNPCScreen extends Screen {
     @Override
     protected void init() {
         // Existing UI setup
+        String currentName = npc.getCustomName() != null ? npc.getCustomName().getString() : ""; // Use NPC's current name or empty string
         this.nameInputField = new TextFieldWidget(
                 this.textRenderer,
                 this.width / 2 - 100,
@@ -50,7 +51,8 @@ public class CustomNPCScreen extends Screen {
                 20,
                 Text.literal("Enter NPC Name")
         );
-        this.nameInputField.setMaxLength(32);
+        this.nameInputField.setText(currentName); // Pre-fill the text field with the NPC's current name
+        this.nameInputField.setMaxLength(32); // Limit to 32 characters
         this.addSelectableChild(this.nameInputField);
 
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Set Name"), button -> {

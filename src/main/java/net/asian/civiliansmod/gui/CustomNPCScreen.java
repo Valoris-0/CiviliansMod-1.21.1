@@ -3,7 +3,6 @@ package net.asian.civiliansmod.gui;
 import net.asian.civiliansmod.entity.NPCEntity;
 import net.asian.civiliansmod.networking.NPCDataPayload;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -69,7 +68,7 @@ public class CustomNPCScreen extends Screen {
 
         // Calculate the maximum scroll offset correctly:
         // Each type has 13 rows (26 models split into pairs in two columns)
-        int totalRows = 13; // Default + Slim = 13 rows for each panel
+        int totalRows = 22; // Default + Slim = 21 rows for each panel
         int visibleRows = (this.height - 100) / ENTITY_SPACING; // Rows that fit on screen at once
 
         // maxScrollOffset is based on rows that are not visible
@@ -197,8 +196,8 @@ public class CustomNPCScreen extends Screen {
 
 
     private int detectClickedVariant(double mouseX, double mouseY, int panelX, boolean isDefault) {
-        int startVariantIndex = isDefault ? 0 : 26;
-        int endVariantIndex = isDefault ? 25 : 51;
+        int startVariantIndex = isDefault ? 0 : 44;
+        int endVariantIndex = isDefault ? 43 : 87;
 
         int startY = 50;
 
@@ -274,8 +273,8 @@ public class CustomNPCScreen extends Screen {
         int startY = 50; // Ensure models render below this Y-coordinate, adjust as needed to avoid overlapping the text
 
         // Render variants in the correct range
-        int startVariantIndex = isDefault ? 0 : 26;
-        int endVariantIndex = isDefault ? 25 : 51;
+        int startVariantIndex = isDefault ? 0 : 44;
+        int endVariantIndex = isDefault ? 43 : 87;
 
         for (int i = startVariantIndex; i <= endVariantIndex; i += 2) {
             int rowIndex = (i - startVariantIndex) / 2;
@@ -292,7 +291,7 @@ public class CustomNPCScreen extends Screen {
     }
 
     private void renderVariantPreview(DrawContext context, int x, int y, int variantIndex, int mouseX, int mouseY) {
-        if (variantIndex > 51) return; // Skip invalid indices
+        if (variantIndex > 87) return; // Skip invalid indices
         NPCEntity previewNPC = createPreviewNPC(variantIndex);
 
         // Render the entity first

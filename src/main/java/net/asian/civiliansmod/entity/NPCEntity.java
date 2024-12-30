@@ -1,5 +1,6 @@
 package net.asian.civiliansmod.entity;
 
+import net.asian.civiliansmod.entity.goal.CustomDoorGoal;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.goal.WanderAroundFarGoal;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
@@ -27,24 +28,24 @@ public class NPCEntity extends PathAwareEntity {
 
     private float targetYaw = 0.0F; // The yaw to smoothly rotate towards
     private boolean isTurning = false; // Whether the NPC is currently in the process of turning
-
+    private int lookAtPlayerTicks = 0;
     public NPCEntity(EntityType<? extends PathAwareEntity> entityType, World world) {
         super(entityType, world);
 
         if (!this.getWorld().isClient) { // Server-side variant assignment
             // Randomly assign the variant (0–2 = default, 3–5 = slim)
-            int variant = this.random.nextInt(53);
+            int variant = this.random.nextInt(89);
             this.setVariant(variant); // Update DataTracker value with assigned variant
 
             // Assign default model and slim model names to the entity
             String[] defaultModelNames = { "Charles", "Cade", "Henry", "Liam", "Rodney", "Nathaniel", "Elliot", "Julian", "Malcolm", "Tobias", "Wesley", "Felix", "Desmond", "Simon", "Miles", "Everett", "Dorian", "Quentin", "Cedric", "Adrian", "Roman", "Marcus", "Gideon", "Levi", "Jasper" };
             String[] slimModelNames = { "Evelyn", "Sarah", "Olivia", "Emma", "Alexia", "Amelia", "Celeste", "Lillian", "Joleen", "Rosalie", "Clara", "Vivienne", "Elena", "Margot", "Nora", "Daphne", "Fiona", "Genevieve", "Juliette", "Lucille", "Naomi", "Ivy", "Serena", "Vera", "Adelaide" };
 
-            if (variant >= 0 && variant <= 25) {  // Default models: Variants 0, 1, 2
+            if (variant >= 0 && variant <= 43) {  // Default models: Variants 0, 1, 2
                 String randomName = defaultModelNames[this.random.nextInt(defaultModelNames.length)];
                 this.setCustomName(Text.literal(randomName));
                 System.out.println("Assigned 'default' name: " + randomName + " to variant: " + variant);
-            } else if (variant >= 26 && variant <= 51) {  // Slim models: Variants 3, 4, 5
+            } else if (variant >= 44 && variant <= 87) {  // Slim models: Variants 3, 4, 5
                 String randomName = slimModelNames[this.random.nextInt(slimModelNames.length)];
                 this.setCustomName(Text.literal(randomName));
                 System.out.println("Assigned 'slim' name: " + randomName + " to variant: " + variant);
@@ -78,7 +79,7 @@ public class NPCEntity extends PathAwareEntity {
 
     // Helper method to determine if the current variant is slim
     public boolean isSlim() {
-        return this.getVariant() >= 26 && this.getVariant() <= 51;
+        return this.getVariant() >= 44 && this.getVariant() <= 87;
     }
 
     @Override
@@ -122,7 +123,12 @@ public class NPCEntity extends PathAwareEntity {
     @Override
     protected void initGoals() {
         super.initGoals();
-        this.goalSelector.add(1, new WanderAroundFarGoal(this, 0.6)); // Wander behavior
+
+
+        this.goalSelector.add(1, new CustomDoorGoal(this));
+
+        this.goalSelector.add(2, new WanderAroundFarGoal(this, 0.7));
+
     }
 
     @Override
@@ -199,7 +205,7 @@ public class NPCEntity extends PathAwareEntity {
                 double dz = player.getZ() - this.getZ();
                 targetYaw = (float) (Math.atan2(dz, dx) * (180F / Math.PI)) - 90F;
                 isTurning = true;
-
+                this.lookAtPlayerTicks = 60;
                 Text nameText = this.getCustomName();
                 String npcName = nameText != null ? nameText.getString() : "NPC";
 
@@ -251,6 +257,12 @@ public class NPCEntity extends PathAwareEntity {
         // Handle smooth turning (called every tick)
         if (isTurning) {
             smoothTurnToTargetYaw();
+        }
+        if (this.lookAtPlayerTicks > 0) {
+            this.lookAtPlayerTicks--; // Countdown
+
+            // Ensure the NPC remains stationary and focused while looking at the player
+            this.getNavigation().stop();
         }
     }
 

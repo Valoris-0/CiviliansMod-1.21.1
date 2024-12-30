@@ -5,8 +5,6 @@ import net.asian.civiliansmod.networking.CustomC2SNetworking;
 import net.asian.civiliansmod.networking.NetworkPayloads;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.object.builder.v1.entity.FabricDefaultAttributeRegistry;
-import net.fabricmc.fabric.api.object.builder.v1.entity.FabricEntityTypeBuilder;
-import net.minecraft.entity.EntityDimensions;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.registry.Registries;
@@ -26,9 +24,9 @@ public class CiviliansMod implements ModInitializer {
     public static final EntityType<NPCEntity> NPC_ENTITY = Registry.register(
             Registries.ENTITY_TYPE,
             Identifier.of(MOD_ID, "npc"),
-            FabricEntityTypeBuilder
-                    .create(SpawnGroup.CREATURE, NPCEntity::new) //
-                    .dimensions(EntityDimensions.changing(0.6f, 1.8f))
+            EntityType.Builder
+                    .create(NPCEntity::new, SpawnGroup.CREATURE)
+                    .dimensions(0.6f, 1.8f)
                     .build()
     );
 

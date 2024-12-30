@@ -34,7 +34,7 @@ public class NPCEntity extends PathAwareEntity {
 
         if (!this.getWorld().isClient) { // Server-side variant assignment
             // Randomly assign the variant (0–2 = default, 3–5 = slim)
-            int variant = this.random.nextInt(89);
+            int variant = this.random.nextInt(88);
             this.setVariant(variant); // Update DataTracker value with assigned variant
 
             // Assign default model and slim model names to the entity
@@ -84,7 +84,7 @@ public class NPCEntity extends PathAwareEntity {
 
     @Override
     public boolean cannotDespawn() {
-        return true; // Prevents the entity from despawning
+        return true;
     }
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
@@ -93,12 +93,10 @@ public class NPCEntity extends PathAwareEntity {
         // Save the variant to NBT
         nbt.putInt("Variant", this.getVariant());
         // Save the custom name to NBT
-        if (this.hasCustomName()) {
-            nbt.putString("CustomName", this.getCustomName().getString());
-        } else {
-            nbt.remove("CustomName"); // Clear old data if no name exists
+
         }
-    }
+
+
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
@@ -108,11 +106,8 @@ public class NPCEntity extends PathAwareEntity {
 
         }
 
-        // Load the custom name from NBT, if exists
-        if (nbt.contains("CustomName")) {
-            this.setCustomName(Text.literal(nbt.getString("CustomName")));
-        }
     }
+
 
     public static DefaultAttributeContainer.Builder createAttributes() {
         return PathAwareEntity.createMobAttributes()

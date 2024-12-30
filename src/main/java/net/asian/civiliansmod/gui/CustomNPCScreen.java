@@ -21,7 +21,7 @@ public class CustomNPCScreen extends Screen {
     private final NPCEntity npc;
 
     // Layout constants
-    private static final int ENTITY_PREVIEW_SIZE = 20; // Downscaled preview
+    private static final int ENTITY_PREVIEW_SIZE = 25; // Downscaled preview
     private static final int ENTITY_SPACING = 60;     // Adjusted spacing
     private static final int COLUMN_WIDTH = 130;
     private int selectedVariant = -1; // No variant is selected by default
@@ -173,7 +173,7 @@ public class CustomNPCScreen extends Screen {
         if (button == 0) { // Left mouse button
             int lineX = this.width / 2;
             int leftPanelX = lineX - COLUMN_WIDTH - 100;
-            int rightPanelX = lineX + 120;
+            int rightPanelX = lineX + 122;
 
             // Check for clicks on either Default or Slim panel
             int clickedVariant = detectClickedVariant(mouseX, mouseY, leftPanelX, true);
@@ -214,9 +214,9 @@ public class CustomNPCScreen extends Screen {
 
             // Check if mouse is within the bounds of either column
             int columnWidthHalf = COLUMN_WIDTH / 2;
-            if (mouseX >= panelX && mouseX <= panelX + columnWidthHalf && mouseY >= yPosition && mouseY <= yPosition + ENTITY_SPACING) {
+            if (mouseX >= panelX && mouseX <= panelX + columnWidthHalf && mouseY >= yPosition +9 && mouseY <= yPosition + ENTITY_SPACING +9) {
                 return i;
-            } else if (mouseX >= panelX + columnWidthHalf && mouseX <= panelX + COLUMN_WIDTH && mouseY >= yPosition && mouseY <= yPosition + ENTITY_SPACING) {
+            } else if (mouseX >= panelX + columnWidthHalf && mouseX <= panelX + COLUMN_WIDTH && mouseY >= yPosition +9 && mouseY <= yPosition + ENTITY_SPACING +9) {
                 return i + 1;
             }
         }
@@ -231,7 +231,7 @@ public class CustomNPCScreen extends Screen {
             int centerX = this.width / 2; // Center horizontally
             int centerY = this.height / 2 + 73; // Adjusted downward by 50 pixels
 
-            renderEntity(context.getMatrices(), centerX, centerY, 55, previewNPC); // Render the NPC larger and lower
+            renderEntity(context.getMatrices(), centerX, centerY, 57, previewNPC); // Render the NPC larger and lower
         }
     }
 
@@ -261,7 +261,7 @@ public class CustomNPCScreen extends Screen {
     }
 
     private void renderVariants(DrawContext context, int mouseX, int mouseY, float delta, boolean isDefault, int scrollOffset, int panelX) {
-        String title = isDefault ? "Default Models" : "  Slim Models";
+        String title = isDefault ? "Default Models" : "   Slim Models";
         context.drawTextWithShadow(
                 this.textRenderer,
                 title,
@@ -270,7 +270,7 @@ public class CustomNPCScreen extends Screen {
                 0xFFFFFF
         );
 
-        int startY = 50; // Ensure models render below this Y-coordinate, adjust as needed to avoid overlapping the text
+        int startY = 65; // Ensure models render below this Y-coordinate, adjust as needed to avoid overlapping the text
 
         // Render variants in the correct range
         int startVariantIndex = isDefault ? 0 : 44;
@@ -298,11 +298,11 @@ public class CustomNPCScreen extends Screen {
         renderEntity(context.getMatrices(), x + ENTITY_PREVIEW_SIZE, y + (ENTITY_SPACING / 2), ENTITY_PREVIEW_SIZE, previewNPC);
 
         // Adjust the hover box dimensions
-        int hoverOffsetY = 12; // Lift the top higher by 12 pixels
-        int adjustedX = x + 1; // Narrow the hover box by reducing 1 pixel from the left
-        int adjustedY = y - hoverOffsetY; // Move the top of the box higher
-        int entityWidth = (ENTITY_PREVIEW_SIZE * 2) - 2; // Reduce the width by 2 pixels
-        int entityHeight = ENTITY_SPACING - hoverOffsetY; // Reduce the height to stop the bottom from going too low
+        int hoverOffsetY = 5; // Lift the top higher by 12 pixels
+        int adjustedX = x + 4; // Narrow the hover box by reducing 1 pixel from the left
+        int adjustedY = y - 22; // Move the top of the box higher
+        int entityWidth = (ENTITY_PREVIEW_SIZE * 2) - 8; // Reduce the width by 2 pixels
+        int entityHeight = ENTITY_SPACING -3 ; // Reduce the height to stop the bottom from going too low
 
         // Check if the mouse is hovering over this variant
         if (mouseX >= adjustedX && mouseX <= adjustedX + entityWidth

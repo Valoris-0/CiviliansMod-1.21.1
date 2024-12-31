@@ -3,7 +3,12 @@
 ## WHAT IS CIVILIANSMOD?
 
 **CiviliansMod is a great way to bring your survival/creative world to another level. Let's say you are working on a city, town, village, etc. Similar to how villagers are in Minecraft villages, CiviliansMod will make it come alive! In a world with your friends, or just yourself, fill the empty areas of your place with active NPCs! The NPCs will look like players in your world and will walk around, go in and out of your buildings, talk to you and more!**
+<br style="page-break-before: always">
+<br style="page-break-before: always">
 
+![showcase](https://cdn.modrinth.com/data/cached_images/d23eecc6960a16144eb76a3c5b201fa265e03e00_0.webp)
+
+<br style="page-break-before: always">
 <br style="page-break-before: always">
 
 ### ROUGH BREAKDOWN ON HOW THE MOD WORKS
@@ -20,6 +25,7 @@
 - You can right click them to get dialogues
 - If they are hurt they will also say some different dialogues
 - Customizable to fit your theme
+- You can also attach a lead to them to pull the entity around if you have a specific place you want them at!
 
 <br style="page-break-before: always">
 
@@ -29,4 +35,4 @@
 2. Put the amethyst in the middle, and then redstone dust all around. Then grab your new NPC Totem item.
 3. Go to an unassigned villager and right click them to transform them into an NPC! **ITS THAT EASY**  
 - Tip: Somehow get a villager to where you are building first, or make a villager breeder to have them at disposal.
-<br style="page-break-before: always">
+- Tip 2: **Sneak + Right click on any NPC to open the customizer GUI**

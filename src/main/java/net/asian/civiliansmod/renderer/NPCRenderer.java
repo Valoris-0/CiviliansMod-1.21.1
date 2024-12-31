@@ -38,16 +38,16 @@ public class NPCRenderer extends MobEntityRenderer<NPCEntity, NPCModel<NPCEntity
 
         // Map variants to textures
         return switch (variant) {
-            case 0 -> Identifier.of("civiliansmod", "textures/entity/npc/default/default_0.png");
-            case 1 -> Identifier.of("civiliansmod", "textures/entity/npc/default/default_1.png");
-            case 2 -> Identifier.of("civiliansmod", "textures/entity/npc/default/default_2.png");
-            case 3 -> Identifier.of("civiliansmod", "textures/entity/npc/default/default_3.png");
-            case 4 -> Identifier.of("civiliansmod", "textures/entity/npc/default/default_4.png");
-            case 5 -> Identifier.of("civiliansmod", "textures/entity/npc/default/default_5.png");
-            case 6 -> Identifier.of("civiliansmod", "textures/entity/npc/default/default_6.png");
-            case 7 -> Identifier.of("civiliansmod", "textures/entity/npc/default/default_7.png");
-            case 8 -> Identifier.of("civiliansmod", "textures/entity/npc/default/default_8.png");
-            case 9 -> Identifier.of("civiliansmod", "textures/entity/npc/default/default_9.png");
+            case 0  -> Identifier.of("civiliansmod", "textures/entity/npc/default/default_0.png");
+            case 1  -> Identifier.of("civiliansmod", "textures/entity/npc/default/default_1.png");
+            case 2  -> Identifier.of("civiliansmod", "textures/entity/npc/default/default_2.png");
+            case 3  -> Identifier.of("civiliansmod", "textures/entity/npc/default/default_3.png");
+            case 4  -> Identifier.of("civiliansmod", "textures/entity/npc/default/default_4.png");
+            case 5  -> Identifier.of("civiliansmod", "textures/entity/npc/default/default_5.png");
+            case 6  -> Identifier.of("civiliansmod", "textures/entity/npc/default/default_6.png");
+            case 7  -> Identifier.of("civiliansmod", "textures/entity/npc/default/default_7.png");
+            case 8  -> Identifier.of("civiliansmod", "textures/entity/npc/default/default_8.png");
+            case 9  -> Identifier.of("civiliansmod", "textures/entity/npc/default/default_9.png");
             case 10 -> Identifier.of("civiliansmod", "textures/entity/npc/default/default_10.png");
             case 11 -> Identifier.of("civiliansmod", "textures/entity/npc/default/default_11.png");
             case 12 -> Identifier.of("civiliansmod", "textures/entity/npc/default/default_12.png");
@@ -117,7 +117,7 @@ public class NPCRenderer extends MobEntityRenderer<NPCEntity, NPCModel<NPCEntity
             case 75 -> Identifier.of("civiliansmod", "textures/entity/npc/slim/slim_31.png");
             case 76 -> Identifier.of("civiliansmod", "textures/entity/npc/slim/slim_32.png");
             case 77 -> Identifier.of("civiliansmod", "textures/entity/npc/slim/slim_33.png");
-            case 78-> Identifier.of("civiliansmod", "textures/entity/npc/slim/slim_34.png");
+            case 78 -> Identifier.of("civiliansmod", "textures/entity/npc/slim/slim_34.png");
             case 79 -> Identifier.of("civiliansmod", "textures/entity/npc/slim/slim_35.png");
             case 80 -> Identifier.of("civiliansmod", "textures/entity/npc/slim/slim_36.png");
             case 81 -> Identifier.of("civiliansmod", "textures/entity/npc/slim/slim_37.png");

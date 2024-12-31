@@ -298,7 +298,6 @@ public class CustomNPCScreen extends Screen {
         renderEntity(context.getMatrices(), x + ENTITY_PREVIEW_SIZE, y + (ENTITY_SPACING / 2), ENTITY_PREVIEW_SIZE, previewNPC);
 
         // Adjust the hover box dimensions
-        int hoverOffsetY = 5; // Lift the top higher by 12 pixels
         int adjustedX = x + 4; // Narrow the hover box by reducing 1 pixel from the left
         int adjustedY = y - 22; // Move the top of the box higher
         int entityWidth = (ENTITY_PREVIEW_SIZE * 2) - 8; // Reduce the width by 2 pixels
@@ -332,8 +331,8 @@ public class CustomNPCScreen extends Screen {
     private NPCEntity createPreviewNPC(int variantIndex) {
         World world = MinecraftClient.getInstance().world;
 
-        // Create a new preview NPC
-        NPCEntity previewNPC = new NPCEntity((EntityType<? extends PathAwareEntity>) npc.getType(), world);
+        @SuppressWarnings("unchecked")// Create a new preview NPC
+        NPCEntity previewNPC = new NPCEntity((EntityType<? extends PathAwareEntity>) npc.getType(), world );
 
         // Set the variant to the current index (this determines slim/default model)
         previewNPC.setVariant(variantIndex);

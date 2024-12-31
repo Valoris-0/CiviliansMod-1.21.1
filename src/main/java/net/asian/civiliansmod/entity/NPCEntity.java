@@ -179,7 +179,6 @@ public class NPCEntity extends PathAwareEntity {
         return hurt;
     }
 
-    @Override
     protected ActionResult interactMob(PlayerEntity player, Hand hand) {
         // Ensure the interaction is in the main hand
         if (hand == Hand.MAIN_HAND) {
@@ -188,6 +187,7 @@ public class NPCEntity extends PathAwareEntity {
                 // Only proceed on the client side
                 if (this.getWorld().isClient) {
                     MinecraftClient.getInstance().setScreen(new CustomNPCScreen(this));
+
                 }
                 return ActionResult.SUCCESS; // Indicate the interaction was handled
             }

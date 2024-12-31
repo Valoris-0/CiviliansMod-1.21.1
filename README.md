@@ -36,3 +36,4 @@
 3. Go to an unassigned villager and right click them to transform them into an NPC! **ITS THAT EASY**  
 - Tip: Somehow get a villager to where you are building first, or make a villager breeder to have them at disposal.
 - Tip 2: **Sneak + Right click on any NPC to open the customizer GUI**
+<br style="page-break-before: always">

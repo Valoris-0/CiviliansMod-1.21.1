@@ -44,7 +44,7 @@ public class CiviliansMod implements ModInitializer {
 
         CustomC2SNetworking.intialize();
 
-        System.out.println("[CiviliansMod] NPC Entity has been registered successfully!");
+
 
     }
 }

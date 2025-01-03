@@ -34,6 +34,7 @@ public class CustomNPCScreen extends Screen {
     private TextFieldWidget nameInputField;
 
     public CustomNPCScreen(NPCEntity npc) {
+
         super(Text.literal("Change NPC Variant"));
         this.npc = npc;
     }
@@ -368,5 +369,6 @@ public class CustomNPCScreen extends Screen {
 
         matrices.pop();
     }
+
 
 }

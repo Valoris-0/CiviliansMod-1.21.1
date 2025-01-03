@@ -11,6 +11,8 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
@@ -21,14 +23,12 @@ import net.minecraft.client.MinecraftClient;
 
 public class NPCEntity extends PathAwareEntity {
     // DataTracker key for the variant
-    private static final TrackedData<Integer> VARIANT = DataTracker.registerData(
-            NPCEntity.class,
-            TrackedDataHandlerRegistry.INTEGER
-    );
-
+    private static final TrackedData<Integer> VARIANT = DataTracker.registerData(NPCEntity.class,
+            TrackedDataHandlerRegistry.INTEGER);
     private float targetYaw = 0.0F; // The yaw to smoothly rotate towards
     private boolean isTurning = false; // Whether the NPC is currently in the process of turning
     private int lookAtPlayerTicks = 0;
+
     public NPCEntity(EntityType<? extends PathAwareEntity> entityType, World world) {
         super(entityType, world);
 
@@ -38,8 +38,10 @@ public class NPCEntity extends PathAwareEntity {
             this.setVariant(variant); // Update DataTracker value with assigned variant
 
             // Assign default model and slim model names to the entity
-            String[] defaultModelNames = { "Charles", "Cade", "Henry", "Liam", "Rodney", "Nathaniel", "Elliot", "Julian", "Malcolm", "Tobias", "Wesley", "Felix", "Desmond", "Simon", "Miles", "Everett", "Dorian", "Quentin", "Cedric", "Adrian", "Roman", "Marcus", "Gideon", "Levi", "Jasper" };
-            String[] slimModelNames = { "Evelyn", "Sarah", "Olivia", "Emma", "Alexia", "Amelia", "Celeste", "Lillian", "Joleen", "Rosalie", "Clara", "Vivienne", "Elena", "Margot", "Nora", "Daphne", "Fiona", "Genevieve", "Juliette", "Lucille", "Naomi", "Ivy", "Serena", "Vera", "Adelaide" };
+            String[] defaultModelNames = { "Charles", "Cade", "Henry", "Liam", "Rodney", "Nathaniel", "Elliot", "Julian", "Malcolm", "Tobias",
+                    "Wesley", "Felix", "Desmond", "Simon", "Miles", "Everett", "Dorian", "Quentin", "Cedric", "Adrian", "Roman", "Marcus", "Gideon", "Levi", "Jasper" };
+            String[] slimModelNames = { "Evelyn", "Sarah", "Olivia", "Emma", "Alexia", "Amelia", "Celeste", "Lillian", "Joleen", "Rosalie",
+                    "Clara", "Vivienne", "Elena", "Margot", "Nora", "Daphne", "Fiona", "Genevieve", "Juliette", "Lucille", "Naomi", "Ivy", "Serena", "Vera", "Adelaide" };
 
             if (variant >= 0 && variant <= 43) {  // Default models: Variants 0, 1, 2
                 String randomName = defaultModelNames[this.random.nextInt(defaultModelNames.length)];
@@ -94,9 +96,7 @@ public class NPCEntity extends PathAwareEntity {
         nbt.putInt("Variant", this.getVariant());
         // Save the custom name to NBT
 
-        }
-
-
+    }
 
     @Override
     public void readCustomDataFromNbt(NbtCompound nbt) {
@@ -108,7 +108,6 @@ public class NPCEntity extends PathAwareEntity {
 
     }
 
-
     public static DefaultAttributeContainer.Builder createAttributes() {
         return PathAwareEntity.createMobAttributes()
                 .add(EntityAttributes.GENERIC_MAX_HEALTH, 20.0) // 20HP
@@ -119,10 +118,9 @@ public class NPCEntity extends PathAwareEntity {
     protected void initGoals() {
         super.initGoals();
 
+        this.goalSelector.add(2, new CustomDoorGoal(this));
 
-        this.goalSelector.add(1, new CustomDoorGoal(this));
-
-        this.goalSelector.add(2, new WanderAroundFarGoal(this, 0.7));
+        this.goalSelector.add(1, new WanderAroundFarGoal(this, 0.7));
 
     }
 
@@ -179,15 +177,38 @@ public class NPCEntity extends PathAwareEntity {
         return hurt;
     }
 
+    @Override
     protected ActionResult interactMob(PlayerEntity player, Hand hand) {
         // Ensure the interaction is in the main hand
         if (hand == Hand.MAIN_HAND) {
+            // Check if the player is holding a lead
+            ItemStack heldItem = player.getStackInHand(hand);
+            if (heldItem.isOf(Items.LEAD) && !this.hasPassengers()) {
+                // Leash the NPC to the player if not already leashed
+                if (!this.getWorld().isClient()) {
+                    if (this.canBeLeashedBy(player)) {
+                        this.attachLeash(player, true);
+                        return ActionResult.SUCCESS;
+                    }
+                }
+            }
+
             // Check if the player is sneaking
             if (player.isSneaking()) {
-                // Only proceed on the client side
-                if (this.getWorld().isClient) {
-                    MinecraftClient.getInstance().setScreen(new CustomNPCScreen(this));
+                if (!this.getWorld().isClient()) {
+                    // Initiate turning to face the player
+                    this.getNavigation().stop();
 
+                    double dx = player.getX() - this.getX();
+                    double dz = player.getZ() - this.getZ();
+                    targetYaw = (float) (Math.atan2(dz, dx) * (180F / Math.PI)) - 90F;
+                    isTurning = true;
+                    this.lookAtPlayerTicks = 170; // NPC will look at the player for 5 seconds (170 ticks)
+
+                    return ActionResult.SUCCESS;
+                } else {
+                    // Open the GUI on the client side
+                    MinecraftClient.getInstance().setScreen(new CustomNPCScreen(this));
                 }
                 return ActionResult.SUCCESS; // Indicate the interaction was handled
             }
@@ -245,6 +266,11 @@ public class NPCEntity extends PathAwareEntity {
         return super.interactMob(player, hand);
     }
 
+    public boolean canBeLeashedBy(PlayerEntity player) {
+        // Allow leashing only if the player is in survival or adventure mode
+        return !this.isLeashed() && !player.isSneaking();
+    }
+
     @Override
     public void tickMovement() {
         super.tickMovement();
@@ -258,6 +284,7 @@ public class NPCEntity extends PathAwareEntity {
 
             // Ensure the NPC remains stationary and focused while looking at the player
             this.getNavigation().stop();
+            this.setVelocity(0.0, 0.0, 0.0);
         }
     }
 

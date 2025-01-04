@@ -261,7 +261,7 @@ public class CustomNPCScreen extends Screen {
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
-    private void renderVariants(DrawContext context, int mouseX, int mouseY, float delta, boolean isDefault, int scrollOffset, int panelX) {
+    private void renderVariants(DrawContext context, int mouseX, int mouseY, float ignoredDelta, boolean isDefault, int scrollOffset, int panelX) {
         String title = isDefault ? "Default Models" : "   Slim Models";
         context.drawTextWithShadow(
                 this.textRenderer,

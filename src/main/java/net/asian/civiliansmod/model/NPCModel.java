@@ -5,16 +5,11 @@ import net.minecraft.client.render.entity.model.PlayerEntityModel;
 import net.minecraft.entity.LivingEntity;
 
 public class NPCModel<T extends LivingEntity> extends PlayerEntityModel<T> {
-    private final boolean slim;
 
     public NPCModel(ModelPart root, boolean slim) {
         super(root, slim); // Automatically uses the slim parameter for arms
-        this.slim = slim;
     }
 
-    public static TexturedModelData getTexturedModelData() {
-        return getTexturedModelData(false); // Default to non-slim model
-    }
 
     public static TexturedModelData getTexturedModelData(boolean slim) {
         ModelData modelData = new ModelData();

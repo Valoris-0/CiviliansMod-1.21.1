@@ -17,6 +17,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.asian.civiliansmod.gui.CustomNPCScreen;
 import net.minecraft.client.MinecraftClient;
@@ -265,7 +266,11 @@ public class NPCEntity extends PathAwareEntity {
         // Delegate to superclass for other interactions
         return super.interactMob(player, hand);
     }
-
+    @Override
+    public Vec3d getLeashOffset() {
+        // Adjusted offset to attach the leash to the NPC's hips
+        return new Vec3d(0.0, 0.9, 0.0); // Adjust the Y-axis offset as needed.
+    }
     public boolean canBeLeashedBy(PlayerEntity player) {
         // Allow leashing only if the player is in survival or adventure mode
         return !this.isLeashed() && !player.isSneaking();

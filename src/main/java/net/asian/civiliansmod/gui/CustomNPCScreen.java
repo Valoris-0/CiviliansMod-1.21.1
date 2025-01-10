@@ -17,6 +17,7 @@ import net.minecraft.util.math.RotationAxis;
 import net.minecraft.world.World;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.PathAwareEntity;
+import net.minecraft.entity.Entity;
 
 public class CustomNPCScreen extends Screen {
     private final NPCEntity npc;
@@ -88,7 +89,7 @@ public class CustomNPCScreen extends Screen {
         context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("Civilian Customizer"), this.width / 2, 20, 0xFFFFFF);
 
         // Render center preview and variants
-        renderCenterPreview(context);
+        renderCenterPreview(context, mouseX, mouseY);
 
         if (isDefaultTab) {
             renderVariants(context, mouseX, mouseY, delta, true, scrollOffset, this.width / 2 - COLUMN_WIDTH - 50);
@@ -260,7 +261,7 @@ public class CustomNPCScreen extends Screen {
     }
 
 
-    private void renderCenterPreview(DrawContext context) {
+    private void renderCenterPreview(DrawContext context, int mouseX, int mouseY) {
         // Determine which skin/variant to preview
         int variantToRender = (selectedVariant == -1) ? originalVariant : selectedVariant;
 
@@ -277,7 +278,24 @@ public class CustomNPCScreen extends Screen {
         int previewX = guiX + 36; // Position inside the GUI on the left side
         int previewY = guiY + (guiHeight / 2) + 35; // Center vertically with slight downward offset
 
-        renderEntity(context.getMatrices(), previewX, previewY, 35, previewNPC);
+        // Calculate head rotation to follow the mouse
+        float deltaX = (float) (previewX - mouseX); // Invert the direction of movement on the X-axis
+        float deltaY = (float) ((mouseY - previewY) + 50.0F); // Invert the direction of movement on the Y-axis
+
+        // Set head yaw (horizontal rotation) and pitch (vertical rotation) for more subtle movements
+        float sensitivityFactor = 3.0F; // Higher value means more subtle movements
+        float headYaw = ((float) Math.atan2(deltaX, 50.0) * (180F / (float) Math.PI)) / sensitivityFactor;
+        float pitch = ((float) Math.atan2(deltaY, 50.0) * (180F / (float) Math.PI)) / sensitivityFactor;
+
+        // Clamp the pitch to prevent extreme angles (e.g., head flipping)
+        pitch = Math.max(-30.0F, Math.min(30.0F, pitch)); // Limits pitch to -30 to +30 degrees
+
+        // Set the NPC's head rotation
+        previewNPC.setHeadYaw(headYaw); // Adjust headYaw for smoother turning behavior
+        previewNPC.setPitch(pitch);    // Vertical up-down movement adjustments
+
+        // Render the entity
+        renderEntity(context.getMatrices(), previewX, previewY, 35, previewNPC, 180.0F);
     }
 
     @Override
@@ -355,7 +373,7 @@ public class CustomNPCScreen extends Screen {
         NPCEntity previewNPC = createPreviewNPC(variantIndex);
 
         // Render the entity first
-        renderEntity(context.getMatrices(), x + ENTITY_PREVIEW_SIZE, y + (ENTITY_SPACING / 2), ENTITY_PREVIEW_SIZE, previewNPC);
+        renderEntity(context.getMatrices(), x + ENTITY_PREVIEW_SIZE, y + (ENTITY_SPACING / 2), ENTITY_PREVIEW_SIZE, previewNPC, 205.0F);
 
         // Adjust the hover box dimensions
         int adjustedX = x + 6; // Narrow the hover box by reducing 1 pixel from the left
@@ -405,25 +423,33 @@ public class CustomNPCScreen extends Screen {
         return previewNPC;
     }
 
-    private void renderEntity(MatrixStack matrices, int x, int y, int scale, NPCEntity entity) {
+    private void renderEntity(MatrixStack matrices, int x, int y, int scale, Entity entity, float rotation) {
         EntityRenderDispatcher dispatcher = MinecraftClient.getInstance().getEntityRenderDispatcher();
 
         matrices.push();
-        matrices.translate(x, y, 10.0);
-        matrices.scale(scale, scale, scale);
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0F));
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(180.0F));
+
+        // Translate into GUI space (position the entity)
+        matrices.translate(x, y, 50.0); // Depth is 50.0 to prevent clipping issues in GUI
+
+        // Scale the entity down (so it fits the GUI)
+        matrices.scale(scale, -scale, scale); // Note the negative Y scale to fix upside-down rendering
+
+        // Rotate to face the player, add custom rotation
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(180.0F + rotation));
+
+        // Render the entity with maximum brightness (to avoid dim lighting)
+        int lightOverride = 15728880; // Max brightness (sky + block light)
 
         dispatcher.render(
                 entity,
-                0.0,
-                0.0,
-                0.0,
-                0.0F,
-                1.0F,
+                0.0, // X position in world space
+                0.0, // Y position in world space
+                0.0, // Z position in world space
+                0.0F, // No head yaw
+                1.0F, // Partial tick (unused in GUI)
                 matrices,
                 MinecraftClient.getInstance().getBufferBuilders().getEntityVertexConsumers(),
-                15728880
+                lightOverride // Ensure maximum brightness for rendering
         );
 
         matrices.pop();

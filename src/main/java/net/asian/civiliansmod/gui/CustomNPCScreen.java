@@ -230,7 +230,7 @@ public class CustomNPCScreen extends Screen {
         panelX += isDefault ? 130 : -100; // Adjust panelX just like in renderVariants
 
         // Add offsets for fine-tuning the clickable area's position
-        int xRightOffset = 15;
+        int xRightOffset = 12;
         int yUpOffset = -19;
 
         // Loop through the variants in the tab
@@ -247,13 +247,9 @@ public class CustomNPCScreen extends Screen {
                 continue; // Skip this variant – it is off-screen
             }
 
-            // Adjust the click area to better match the rendered entity sizes
-            int hoverBoxWidth = columnWidth - 10; // Slightly smaller than the column width
-            int hoverBoxHeight = ENTITY_SPACING - 10; // Slightly smaller than row spacing
-
             // Check if the mouse overlaps this hover box
-            if (mouseX >= xPosition && mouseX <= xPosition + hoverBoxWidth &&
-                    mouseY >= yPosition && mouseY <= yPosition + hoverBoxHeight) {
+            if (mouseX >= xPosition && mouseX <= xPosition + columnWidth &&
+                    mouseY >= yPosition && mouseY <= yPosition + ENTITY_SPACING) {
                 return i; // Return the clicked variant
             }
         }
@@ -340,8 +336,8 @@ public class CustomNPCScreen extends Screen {
         if (isDefault) {
             panelX += 130; // Move Default models to the right if needed
         }
-    else {
-        panelX -=  100;
+        else {
+            panelX -=  100;
         }
         // Adjust spacing for columns to make them closer together
         int columnWidth = (COLUMN_WIDTH / 3) - 10; // Reduce width slightly to bring columns closer together (use `-10` as an offset)
@@ -373,7 +369,7 @@ public class CustomNPCScreen extends Screen {
         NPCEntity previewNPC = createPreviewNPC(variantIndex);
 
         // Render the entity first
-        renderEntity(context.getMatrices(), x + ENTITY_PREVIEW_SIZE, y + (ENTITY_SPACING / 2), ENTITY_PREVIEW_SIZE, previewNPC, 205.0F);
+        renderEntity(context.getMatrices(), x + ENTITY_PREVIEW_SIZE, y + (ENTITY_SPACING / 2), ENTITY_PREVIEW_SIZE, previewNPC, 145.0F);
 
         // Adjust the hover box dimensions
         int adjustedX = x + 6; // Narrow the hover box by reducing 1 pixel from the left

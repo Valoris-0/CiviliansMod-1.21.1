@@ -135,8 +135,8 @@ public class NPCEntity extends PathAwareEntity {
     protected void initGoals() {
         super.initGoals();
         this.goalSelector.add(1, new WanderAroundFarGoal(this, 0.7));
-        this.goalSelector.add(5, new CustomDoorGoal(this));
-        this.goalSelector.add(6, new LookAroundGoal(this));
+        this.goalSelector.add(6, new CustomDoorGoal(this));
+        this.goalSelector.add(4, new LookAroundGoal(this));
     }
 
     @Override

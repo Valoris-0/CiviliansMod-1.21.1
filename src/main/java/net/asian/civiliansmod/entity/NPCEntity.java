@@ -32,6 +32,8 @@ public class NPCEntity extends PathAwareEntity {
     private int lookAtPlayerTicks = 0;
     private static final TrackedData<Boolean> IS_PAUSED = DataTracker.registerData(NPCEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private int regenerationCooldown = 0;
+    private static final TrackedData<Boolean> IS_FOLLOWING = DataTracker.registerData(NPCEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+
     public NPCEntity(EntityType<? extends PathAwareEntity> entityType, World world) {
         super(entityType, world);
 
@@ -66,6 +68,7 @@ public class NPCEntity extends PathAwareEntity {
         super.initDataTracker(builder);
         builder.add(VARIANT, 0);
         builder.add(IS_PAUSED, false);
+        builder.add(IS_FOLLOWING, false);
     }
 
     // Getter for the variant
@@ -93,6 +96,14 @@ public class NPCEntity extends PathAwareEntity {
         return true;
     }
 
+    public boolean isFollowing() {
+        return this.dataTracker.get(IS_FOLLOWING);
+    }
+
+    public void setFollowing(boolean following) {
+        this.dataTracker.set(IS_FOLLOWING, following);
+    }
+
     public boolean isPaused() {
         return this.dataTracker.get(IS_PAUSED);
     }
@@ -108,7 +119,7 @@ public class NPCEntity extends PathAwareEntity {
         // Save the variant to NBT
         nbt.putInt("Variant", this.getVariant());
         nbt.putBoolean("IsPaused", this.isPaused());
-
+        nbt.putBoolean("IsFollowing", this.isFollowing());
 
     }
 
@@ -122,7 +133,9 @@ public class NPCEntity extends PathAwareEntity {
         if (nbt.contains("IsPaused")) {
             this.setPaused(nbt.getBoolean("IsPaused")); // Load paused state
         }
-
+        if (nbt.contains("IsFollowing")) {
+            this.setFollowing(nbt.getBoolean("IsFollowing"));
+        }
     }
 
     public static DefaultAttributeContainer.Builder createAttributes() {
@@ -292,15 +305,16 @@ public class NPCEntity extends PathAwareEntity {
 
     @Override
     public void tickMovement() {
+        // Handle paused state
         if (isPaused()) {
             // Ensure NPC does not move while paused
             this.getNavigation().stop();
             this.setVelocity(0.0, 0.0, 0.0);
 
-            // Make the NPC look at the nearest player within 10 blocks
+            // Make the NPC look at the nearest player within 5 blocks
             PlayerEntity nearestPlayer = this.getWorld().getClosestPlayer(this, 5.0);
             if (nearestPlayer != null) {
-                // Calculate the direction to look at the player
+                // Calculate direction for looking at the player
                 double dx = nearestPlayer.getX() - this.getX();
                 double dy = nearestPlayer.getEyeY() - this.getEyeY(); // Adjust for eye level
                 double dz = nearestPlayer.getZ() - this.getZ();
@@ -311,12 +325,47 @@ public class NPCEntity extends PathAwareEntity {
                 float targetPitch = (float) -(Math.atan2(dy, distance) * (180.0 / Math.PI)); // Vertical rotation
 
                 // Smoothly adjust the headYaw and pitch towards the target
-                this.headYaw = adjustTowards(this.headYaw, targetYaw); // Max turn rate of 5 degrees per tick
-                this.setPitch(adjustTowards(this.getPitch(), targetPitch)); // Smooth pitch adjustment
+                this.headYaw = adjustTowards(this.headYaw, targetYaw);
+                this.setPitch(adjustTowards(this.getPitch(), targetPitch));
             }
             return; // Skip additional logic while paused
         }
 
+        // Handle "Follow" state
+        if (isFollowing() && this.getWorld() != null && !this.getWorld().isClient) {
+            PlayerEntity nearestPlayer = this.getWorld().getClosestPlayer(this, 15); // Follow within a 10-block radius
+
+            if (nearestPlayer != null) {
+                double distanceToPlayer = this.squaredDistanceTo(nearestPlayer);
+
+                // Check the distance and adjust behavior dynamically
+                if (distanceToPlayer > 4.0 && distanceToPlayer < 400.0) { // Follow if distance > 2 blocks but < 20 blocks
+                    double deltaX = nearestPlayer.getX() - this.getX();
+                    double deltaY = nearestPlayer.getEyeY() - this.getEyeY();
+                    double deltaZ = nearestPlayer.getZ() - this.getZ();
+
+                    // Dynamically adjust the speed based on distance (faster speed if farther away)
+                    double distance = Math.sqrt(deltaX * deltaX + deltaZ * deltaZ);
+                    double followSpeed = Math.min(3.5, 0.35 + (distance / 10.0)); // Max speed capped at 2.5
+
+                    // Start moving towards the player
+                    this.getNavigation().startMovingTo(nearestPlayer, followSpeed);
+
+
+                    if (distance > 16.0) {
+                        this.refreshPositionAndAngles(nearestPlayer.getX() - deltaX / 2, nearestPlayer.getY(), nearestPlayer.getZ() - deltaZ / 2, this.getYaw(), this.getPitch());
+                        this.getNavigation().stop(); // Prevent glitches just after teleportation
+                    }
+                } else if (distanceToPlayer <= 4.0) {
+                    this.getNavigation().stop(); // NPC is close enough; stop moving
+                }
+            } else {
+                // Stop moving if no player is nearby
+                this.getNavigation().stop();
+            }
+        }
+
+        // Additional movement logic like smooth turning
         super.tickMovement();
 
         // Handle smooth turning (called every tick)
@@ -331,12 +380,13 @@ public class NPCEntity extends PathAwareEntity {
             this.setVelocity(0.0, 0.0, 0.0);
         }
 
+        // Handle regeneration logic
         if (this.isAlive() && this.getHealth() < this.getMaxHealth()) {
             if (regenerationCooldown <= 0) {
-                this.heal(1.0F); // Regenerate 1 health every cooldown reset.
-                regenerationCooldown = 20; // Reset cooldown (20 ticks = 1 second).
+                this.heal(1.0F); // Regenerate 1 health every cooldown reset
+                regenerationCooldown = 20; // Reset cooldown (20 ticks = 1 second)
             } else {
-                regenerationCooldown--; // Decrease regeneration cooldown every tick.
+                regenerationCooldown--; // Decrease regeneration cooldown every tick
             }
         }
     }

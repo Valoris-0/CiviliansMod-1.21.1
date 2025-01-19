@@ -24,7 +24,7 @@ public class CustomNPCScreen extends Screen {
 
     // Layout constants
     private static final int ENTITY_PREVIEW_SIZE = 25; // Downscaled preview
-    private static final int ENTITY_SPACING = 60;     // Adjusted spacing
+    private static final int ENTITY_SPACING = 58;     // Adjusted spacing
     private static final int COLUMN_WIDTH = 130;
     private int selectedVariant; // No variant is selected by default
     private int scrollOffset = 0;  // Current scroll offset
@@ -95,7 +95,7 @@ public class CustomNPCScreen extends Screen {
         this.drawMainContainer(context);
 
         // Center text
-        context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("Civilian Customizer"), this.width / 2, 20, 0xFFFFFF);
+        context.drawCenteredTextWithShadow(this.textRenderer, Text.literal("Civilian Customizer"), this.width / 2, 30, 0xFFFFFF);
 
         // Render center preview and variants
         renderCenterPreview(context, mouseX, mouseY);
@@ -128,21 +128,32 @@ public class CustomNPCScreen extends Screen {
             isDefaultTab = true;
             scrollOffset = 0;
             updateScrollBarDimensions();
-        }).dimensions(containerX + 82, containerY + 24, 40, 12).build());
+        }).dimensions(containerX + 82, containerY + 22, 39, 12).build());
 
         // Add Slim tab button
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Slim"), button -> {
             isDefaultTab = false;
             scrollOffset = 0;
             updateScrollBarDimensions();
-        }).dimensions(containerX + 123, containerY + 24, 40, 12).build());
+        }).dimensions(containerX + 121, containerY + 22, 40, 12).build());
 
+        this.addDrawableChild(ButtonWidget.builder(Text.literal("Custom (Coming Soon)"), button -> {
+            scrollOffset = 0;
+            updateScrollBarDimensions();
+        }).dimensions(containerX + 161, containerY + 22, 39, 12).build());
+
+        this.addDrawableChild(ButtonWidget.builder(Text.literal("Save"), button -> {
+            this.close();
+            scrollOffset = 0;
+            updateScrollBarDimensions();
+        }).dimensions(containerX + 11, containerY + 136, 50, 14).build());
 
         String currentName = npc.getCustomName() != null ? npc.getCustomName().getString() : ""; // Use NPC's current name or empty string
         this.nameInputField = new TextFieldWidget(
                 this.textRenderer,
-                containerX + 5, containerY + 28, 62, 14, Text.literal("Enter NPC Name")
+                containerX + 5, containerY + 22, 62, 14, Text.literal("Enter NPC Name")
         );
+
 
         ButtonWidget pauseButton = ButtonWidget.builder(Text.literal(npc.isPaused() ? "Stay: On" : "Stay: Off"), button -> {
                     boolean newState = !npc.isPaused();
@@ -150,8 +161,17 @@ public class CustomNPCScreen extends Screen {
                     button.setMessage(Text.literal(newState ? "Stay: On" : "Stay: Off")); // Update button text
                 }).dimensions(containerX + 202, containerY + containerHeight - 129, 49, 20) // Adjust position and size
                 .build();
-
         this.addDrawableChild(pauseButton); // Add button to the screen
+
+        ButtonWidget followButton = ButtonWidget.builder(Text.literal(npc.isFollowing() ? "Follow: On" : "Follow: Off"), button -> {
+                    boolean newState = !npc.isFollowing();
+                    npc.setFollowing(newState); // Update NPC's follow state
+                    button.setMessage(Text.literal(newState ? "Follow: On" : "Follow: Off")); // Update button text
+                }).dimensions(containerX + 202, containerY + containerHeight - 95, 49, 20) // Adjust position and size
+                .build();
+
+        this.addDrawableChild(followButton); // Add button to the screen
+
         this.nameInputField.setText(currentName); // Pre-fill the text field with the NPC's current name
         this.nameInputField.setMaxLength(32); // Limit to 32 characters
         this.addSelectableChild(this.nameInputField);
@@ -173,7 +193,8 @@ public class CustomNPCScreen extends Screen {
                     npc.getUuid(),
                     nameInputField.getText(),
                     npc.getVariant(),
-                    npc.isPaused() // Add paused state
+                    npc.isPaused(), // Add paused state
+                    npc.isFollowing()
             );
             ClientPlayNetworking.send(payload); // Send data to the server
         }
@@ -303,16 +324,23 @@ public class CustomNPCScreen extends Screen {
         float deltaY = (mouseY - previewY) + 50.0F;
 
         // Set head yaw (horizontal rotation) and pitch (vertical rotation) for more subtle movements
-        float sensitivityFactor = 3.0F; // Higher value means more subtle movements
+        float sensitivityFactor = 2.5F; // Higher value means more subtle movements
         float headYaw = ((float) Math.atan2(deltaX, 50.0) * (180F / (float) Math.PI)) / sensitivityFactor;
         float pitch = ((float) Math.atan2(deltaY, 50.0) * (180F / (float) Math.PI)) / sensitivityFactor;
 
         // Clamp the pitch to prevent extreme angles (e.g., head flipping)
-        pitch = Math.max(-30.0F, Math.min(30.0F, pitch)); // Limits pitch to -30 to +30 degrees
+        pitch = Math.max(-30.0F, Math.min(30.0F, pitch)); // Limit pitch to -30 to +30 degrees
 
-        // Set the NPC's head rotation
+        // Adjust body yaw to move less than the head
+        float bodyYaw = headYaw / 1.2F; // Less movement than the head
+
+        // Update the NPC entity's rotation attributes
         previewNPC.setHeadYaw(headYaw); // Adjust headYaw for smoother turning behavior
-        previewNPC.setPitch(pitch);    // Vertical up-down movement adjustments
+        previewNPC.setPitch(pitch);     // Vertical up-down movement adjustments
+
+        // Update body yaw (and previous yaw) directly for rendering
+        previewNPC.bodyYaw = bodyYaw;         // Set the current body yaw
+        previewNPC.prevBodyYaw = bodyYaw;     // Synchronize previous yaw for smooth animation
 
         // Render the entity
         renderEntity(context.getMatrices(), previewX, previewY, 35, previewNPC, 180.0F);
@@ -363,14 +391,14 @@ public class CustomNPCScreen extends Screen {
         int containerY = (this.height - containerHeight) / 2;
 
         // Initial Y position relative to the container
-        int startY = containerY + 59;
+        int startY = containerY + 61;
 
 
-        int panelX = containerX + 78; // Position Default tab models within the container
+        int panelX = containerX + 77; // Position Default tab models within the container
 
         // Adjust spacing for columns for better alignment
         int columnWidth = (COLUMN_WIDTH / 3) - 10; // Reduced width to bring columns closer
-        int columnOffset = 5; // Fine-tune additional space between columns
+        int columnOffset = 6; // Fine-tune additional space between columns
 
         // Render variants in the correct range
         int startVariantIndex = isDefault ? 0 : 44;
@@ -408,10 +436,10 @@ public class CustomNPCScreen extends Screen {
         int maxY = containerY + containerHeight;
 
         // Adjust the hover box dimensions
-        int adjustedX = x + 6; // Narrow the hover box by reducing 1 pixel from the left
-        int adjustedY = y - 21; // Move the top of the box higher
-        int entityWidth = (ENTITY_PREVIEW_SIZE * 2) - 12; // Reduce the width by 2 pixels
-        int entityHeight = ENTITY_SPACING - 6; // Reduce the height to stop the bottom from going too low
+        int adjustedX = x + 5; // Narrow the hover box by reducing 1 pixel from the left
+        int adjustedY = y - 24; // Move the top of the box higher
+        int entityWidth = 39;   // Set a fixed width (e.g., 50 pixels)
+        int entityHeight = ENTITY_SPACING ;  // Set a fixed height (e.g., 50 pixels)
 
         // Ensure the variant preview stays within the container bounds
         if (adjustedX + entityWidth > maxX || adjustedX < containerX) return; // Skip rendering if out of bounds horizontally
@@ -424,7 +452,7 @@ public class CustomNPCScreen extends Screen {
         if (mouseX >= adjustedX && mouseX <= adjustedX + entityWidth
                 && mouseY >= adjustedY && mouseY <= adjustedY + entityHeight) {
             // Draw a white rectangle outline around the entity preview by filling in each edge
-            int outlineThickness = 1; // Thickness of the outline
+            int outlineThickness = 2; // Thickness of the outline
 
             // Top border
             context.fill(adjustedX, adjustedY,

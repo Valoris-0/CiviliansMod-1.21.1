@@ -26,6 +26,8 @@
 - If they are hurt they will also say some different dialogues
 - Customizable to fit your theme
 - You can also attach a lead to them to pull the entity around if you have a specific place you want them at!
+- Stay in place
+- Have them follow you around!
 
 <br style="page-break-before: always">
 

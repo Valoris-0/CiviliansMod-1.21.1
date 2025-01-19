@@ -48,16 +48,25 @@ public class CustomNPCScreen extends Screen {
 
 
     private void updateScrollBarDimensions() {
-        int totalRows = 15;
-        int visibleRows = (this.height - 100) / ENTITY_SPACING;
+        // Container dimensions
+        int containerWidth = 256;
+        int containerHeight = 166;
+        int containerX = (this.width - containerWidth) / 2;
+        int containerY = (this.height - containerHeight) / 2;
+
+        // Total rows and visible rows calculation
+        int totalRows = 15; // Total number of rows
+        int visibleRows = (containerHeight - 55) / ENTITY_SPACING; // Adjust relative to the container height
 
         this.maxScrollOffset = Math.max(0, (totalRows - visibleRows) * ENTITY_SPACING);
 
-        int scrollBarTotalHeight = this.height - 161;
+        // Scroll bar total height based on the container
+        int scrollBarTotalHeight = containerHeight - 55; // Leave padding inside the container
         float visiblePercentage = (float) visibleRows / totalRows;
 
+        // Scroll bar handle height and vertical position calculation
         this.scrollbarHeight = Math.max((int) (visiblePercentage * scrollBarTotalHeight), 15);
-        this.scrollbarY = 93 + (int) ((float) this.scrollOffset / this.maxScrollOffset * (scrollBarTotalHeight - this.scrollbarHeight));
+        this.scrollbarY = containerY + 40 + (int) ((float) this.scrollOffset / this.maxScrollOffset * (scrollBarTotalHeight - this.scrollbarHeight));
     }
 
 
@@ -114,26 +123,29 @@ public class CustomNPCScreen extends Screen {
     protected void init() {
         super.init();
 
-        // Add Default tab button
+        int containerWidth = 256;
+        int containerHeight = 166;
+        int containerX = (this.width - containerWidth) / 2;
+        int containerY = (this.height - containerHeight) / 2;
+
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Default"), button -> {
-                    isDefaultTab = true; // Switch to Default tab
-                    scrollOffset = 0; // Reset scrolling for the tab
-                    updateScrollBarDimensions(); // Recalculate scroll bars for the current tab
-                }).dimensions(this.width / 2 - 46, 78,40,12).build()
-        );
+            isDefaultTab = true;
+            scrollOffset = 0;
+            updateScrollBarDimensions();
+        }).dimensions(containerX + 82, containerY + 24, 40, 12).build());
 
         // Add Slim tab button
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Slim"), button -> {
-                    isDefaultTab = false; // Switch to Slim tab
-                    scrollOffset = 0; // Reset scrolling for the tab
-                    updateScrollBarDimensions(); // Recalculate scroll bars for the current tab
-                }).dimensions(this.width / 2 , 78, 40, 12).build()
-        );
+            isDefaultTab = false;
+            scrollOffset = 0;
+            updateScrollBarDimensions();
+        }).dimensions(containerX + 123, containerY + 24, 40, 12).build());
+
 
         String currentName = npc.getCustomName() != null ? npc.getCustomName().getString() : ""; // Use NPC's current name or empty string
         this.nameInputField = new TextFieldWidget(
                 this.textRenderer,
-                this.width / 2 - 122, 80, 60, 14, Text.literal("Enter NPC Name")
+                containerX + 5, containerY + 28, 62, 14, Text.literal("Enter NPC Name")
         );
         this.nameInputField.setText(currentName); // Pre-fill the text field with the NPC's current name
         this.nameInputField.setMaxLength(32); // Limit to 32 characters
@@ -163,28 +175,31 @@ public class CustomNPCScreen extends Screen {
         super.close();
     }
     private void renderVanillaScrollBar(DrawContext context) {
-        int scrollBarX = 198; // X position (leftmost side of the screen)
-        int scrollBarY = 93; // Start of the scrollable area
-        int scrollBarHeight = this.height - 161; // Total height available for scrolling
+        int containerWidth = 256;
+        int containerHeight = 166;
+        int containerX = (this.width - containerWidth) / 2;
+        int containerY = (this.height - containerHeight) / 2;
 
-        // Draw the scroll bar track (background) - dark gray
-        context.fill(scrollBarX, scrollBarY, scrollBarX + 6, scrollBarY + scrollBarHeight, 0xFF202020); // Dark gray background
+        int scrollBarX = containerX + 70; // Positioned near the right edge of the container
+        int scrollBarY = containerY + 38; // Start 10 pixels below the top of the container
+        int scrollBarHeight = containerHeight - 51; // Adjust for padding (20 pixels)
 
-        // Calculate the position and size of the scroll handle
-        int handleTop = this.scrollbarY; // Dynamic Y position of the handle
-        int handleHeight = this.scrollbarHeight; // Height of the scroll handle
-
-        // Draw the scroll handle (beveled edges)
-        context.fill(scrollBarX + 1, handleTop, scrollBarX + 5, handleTop + handleHeight, 0xFFAAAAAA); // Light gray center
-        context.fill(scrollBarX, handleTop, scrollBarX + 1, handleTop + handleHeight, 0xFF888888); // Left edge (darker)
-        context.fill(scrollBarX + 5, handleTop, scrollBarX + 6, handleTop + handleHeight, 0xFF888888); // Right edge (darker)
+        context.fill(scrollBarX, scrollBarY, scrollBarX + 6, scrollBarY + scrollBarHeight, 0xFF202020);
+        context.fill(scrollBarX + 1, this.scrollbarY, scrollBarX + 5, this.scrollbarY + this.scrollbarHeight, 0xFFAAAAAA);
     }
 
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        // Scroll bar position variables
-        int scrollBarX = 198;
+        // Container dimensions
+        int containerWidth = 256;
+        int containerHeight = 166;
+        int containerX = (this.width - containerWidth) / 2;
+        int containerY = (this.height - containerHeight) / 2;
+
+        // Scroll bar position
+        int scrollBarX = containerX + 70; // Match `renderVanillaScrollBar`
+        int scrollBarY = containerY + 40; // Match `renderVanillaScrollBar`
 
         // Check if clicking within the scroll handle
         if (mouseX >= scrollBarX && mouseX <= scrollBarX + 6 && mouseY >= this.scrollbarY && mouseY <= this.scrollbarY + this.scrollbarHeight) {
@@ -197,10 +212,7 @@ public class CustomNPCScreen extends Screen {
 
         // Check if a model is clicked
         if (button == 0) { // Left mouse button
-            int lineX = this.width / 2;
-
-            // Determine the X position of the correct panel (Default or Slim)
-            int panelX = isDefaultTab ? (lineX - COLUMN_WIDTH - 50) : (lineX + 50);
+            int panelX = isDefaultTab ? (containerX + 10) : (containerX + COLUMN_WIDTH + 30);
 
             // Detect which variant is clicked based on the selected tab
             int clickedVariant = detectClickedVariant(mouseX, mouseY, panelX, isDefaultTab);
@@ -208,9 +220,8 @@ public class CustomNPCScreen extends Screen {
             if (clickedVariant != -1) {
                 this.selectedVariant = clickedVariant;
                 this.npc.setVariant(clickedVariant); // Update NPC variant immediately
-                npc.writeCustomDataToNbt(npc.writeNbt(new NbtCompound()));
 
-                // Save changes to ensure they persist
+                npc.writeCustomDataToNbt(npc.writeNbt(new NbtCompound())); // Save changes to ensure they persist
             }
         }
 
@@ -218,42 +229,54 @@ public class CustomNPCScreen extends Screen {
     }
 
 
-    private int detectClickedVariant(double mouseX, double mouseY, int panelX, boolean isDefault) {
-        int startVariantIndex = isDefault ? 0 : 44; // Start index based on tab
-        int endVariantIndex = isDefault ? 43 : 87; // End index based on tab
+    private int detectClickedVariant(double mouseX, double mouseY, int panelX, boolean isDefaultTab) {
+        // Container dimensions
+        int containerWidth = 255;
+        int containerHeight = 166;
+        int containerX = (this.width - containerWidth) / 2;
+        int containerY = (this.height - containerHeight) / 2;
 
-        int startY = 115; // Starting Y position for skins
-        int columnWidth = (COLUMN_WIDTH / 3) - 10; // Match render calculation
-        int columnOffset = 5; // Match spacing calculation from renderVariants
+        // Starting variant index based on the active tab
+        int startVariantIndex = isDefaultTab ? 0 : 44;
+        int endVariantIndex = isDefaultTab ? 43 : 87;
 
-        // Align the panelX based on the tab
-        panelX += isDefault ? 130 : -100; // Adjust panelX just like in renderVariants
+        int startY = containerY + 39; // Matches where variants start rendering
 
-        // Add offsets for fine-tuning the clickable area's position
-        int xRightOffset = 12;
-        int yUpOffset = -19;
+        // Column setup
+        int columnWidth = (COLUMN_WIDTH / 3) - 10; // Adjusted for columns in renderVariants
+        int columnOffset = 5;
 
-        // Loop through the variants in the tab
+        // Fine-tune X offsets
+        int xRightOffset = isDefaultTab ? 76 : -76; // Shift Slim tab to the left
+
+        // Strict container boundaries
+        if (mouseY < containerY || mouseY > containerY + containerHeight) {
+            return -1; // Mouse click is entirely outside the vertical container area
+        }
+
+        // Loop through all rendered variants
         for (int i = startVariantIndex; i <= endVariantIndex; i++) {
-            int rowIndex = (i - startVariantIndex) / 3; // Determine the row
-            int columnIndex = (i - startVariantIndex) % 3; // Determine the column
+            // Current variant's row and column
+            int rowIndex = (i - startVariantIndex) / 3; // Determine row
+            int columnIndex = (i - startVariantIndex) % 3; // Determine column
 
-            int xPosition = panelX + columnIndex * (columnWidth + columnOffset) + xRightOffset; // X position in the row
-            int yPosition = startY + rowIndex * ENTITY_SPACING - scrollOffset + yUpOffset; // Y position (moved up)
+            // Variant's calculated position
+            int xPosition = panelX + columnIndex * (columnWidth + columnOffset) + xRightOffset;
+            int yPosition = startY + rowIndex * ENTITY_SPACING - scrollOffset;
 
-            // **New Visibility Check**
-            // Skip rows that are out of view (same condition as rendering logic)
-            if (yPosition + ENTITY_SPACING < 150 || yPosition > this.height - 100) {
-                continue; // Skip this variant – it is off-screen
+            // Extra check: Skip rows rendered above the visible container
+            if (yPosition < containerY || yPosition + ENTITY_SPACING > containerY + containerHeight) {
+                continue; // Skip variants not actually visible
             }
 
-            // Check if the mouse overlaps this hover box
+            // Check if the mouse position falls within the variant's hover box
             if (mouseX >= xPosition && mouseX <= xPosition + columnWidth &&
                     mouseY >= yPosition && mouseY <= yPosition + ENTITY_SPACING) {
-                return i; // Return the clicked variant
+                return i; // Return the clicked variant index
             }
         }
-        return -1; // No variant clicked
+
+        return -1; // No variant was clicked
     }
 
 
@@ -276,7 +299,7 @@ public class CustomNPCScreen extends Screen {
 
         // Calculate head rotation to follow the mouse
         float deltaX = (float) (previewX - mouseX); // Invert the direction of movement on the X-axis
-        float deltaY = (float) ((mouseY - previewY) + 50.0F); // Invert the direction of movement on the Y-axis
+        float deltaY = (mouseY - previewY) + 50.0F;
 
         // Set head yaw (horizontal rotation) and pitch (vertical rotation) for more subtle movements
         float sensitivityFactor = 3.0F; // Higher value means more subtle movements
@@ -297,17 +320,21 @@ public class CustomNPCScreen extends Screen {
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (this.isScrolling) {
-            // Start of scroll bar and total height available for the track
-            int scrollBarY = 93;
-            int scrollBarHeight = this.height - 161;
+
+            int containerWidth = 256;
+            int containerHeight = 166;
+            int containerX = (this.width - containerWidth) / 2;
+            int containerY = (this.height - containerHeight) / 2;
+
+            // Scroll bar position and height
+            int scrollBarY = containerY + 40; // Match `renderVanillaScrollBar` and `updateScrollBarDimensions`
+            int scrollBarHeight = containerHeight - 55;
 
             // Adjust relativeY to account for the grab offset
             float relativeY = (float) (mouseY - scrollBarY - this.scrollbarGrabOffset);
             float scrollPercent = relativeY / (scrollBarHeight - this.scrollbarHeight);
 
-            // Calculate new scrollOffset and clamp to the nearest row
-
-
+            // Calculate new scrollOffset and clamp
             this.scrollOffset = Math.max(0, Math.min((int) (scrollPercent * maxScrollOffset), maxScrollOffset));
 
             // Snap scroll offset to the nearest row
@@ -330,37 +357,40 @@ public class CustomNPCScreen extends Screen {
     }
 
     private void renderVariants(DrawContext context, int mouseX, int mouseY, float ignoredDelta, boolean isDefault, int scrollOffset, int panelX) {
-        int startY = 115;
+        // Container dimensions
+        int containerWidth = 256;
+        int containerHeight = 166;
+        int containerX = (this.width - containerWidth) / 2;
+        int containerY = (this.height - containerHeight) / 2;
 
-        // Adjust panelX if Default tab is selected
-        if (isDefault) {
-            panelX += 130; // Move Default models to the right if needed
-        }
-        else {
-            panelX -=  100;
-        }
-        // Adjust spacing for columns to make them closer together
-        int columnWidth = (COLUMN_WIDTH / 3) - 10; // Reduce width slightly to bring columns closer together (use `-10` as an offset)
-        int columnOffset = 5; // Fine tune additional space between columns (optional)
+        // Initial Y position relative to the container
+        int startY = containerY + 59;
+
+
+        panelX = containerX + 78; // Position Default tab models within the container
+
+        // Adjust spacing for columns for better alignment
+        int columnWidth = (COLUMN_WIDTH / 3) - 10; // Reduced width to bring columns closer
+        int columnOffset = 5; // Fine-tune additional space between columns
 
         // Render variants in the correct range
         int startVariantIndex = isDefault ? 0 : 44;
         int endVariantIndex = isDefault ? 43 : 87;
 
         for (int i = startVariantIndex; i <= endVariantIndex; i++) {
-            int rowIndex = (i - startVariantIndex) / 3; // Divide models into groups of 3 for rows
-            int columnIndex = (i - startVariantIndex) % 3; // Determine which column the model should be in
-            int xPosition = panelX + columnIndex * (columnWidth + columnOffset); // Adjust position with reduced spacing
-            int yPosition = startY + rowIndex * ENTITY_SPACING - scrollOffset; // Vertical position
+            // Compute the row and column positions for each variant
+            int rowIndex = (i - startVariantIndex) / 3; // Divide into groups of 3 per row
+            int columnIndex = (i - startVariantIndex) % 3; // Determine which column the model is in
+            int xPosition = panelX + columnIndex * (columnWidth + columnOffset); // Adjust horizontal position
+            int yPosition = startY + rowIndex * ENTITY_SPACING - scrollOffset; // Adjust vertical position
 
-            // Skip rows out of visible range
-            if (yPosition + ENTITY_SPACING < 150 || yPosition > this.height - 60) {
-                continue; // Skip rows that are out of bounds or render above the threshold
+            // Skip rows that are completely out of container bounds
+            if (yPosition + ENTITY_SPACING < containerY || yPosition > containerY + containerHeight) {
+                continue; // Don't render if the row is invisible
             }
 
             // Render the model for the current variant
             renderVariantPreview(context, xPosition, yPosition, i, mouseX, mouseY);
-
         }
     }
 
@@ -368,14 +398,30 @@ public class CustomNPCScreen extends Screen {
         if (variantIndex > 87) return; // Skip invalid indices
         NPCEntity previewNPC = createPreviewNPC(variantIndex);
 
-        // Render the entity first
-        renderEntity(context.getMatrices(), x + ENTITY_PREVIEW_SIZE, y + (ENTITY_SPACING / 2), ENTITY_PREVIEW_SIZE, previewNPC, 145.0F);
+        // Container dimensions
+        int containerWidth = 256;
+        int containerHeight = 166;
+        int containerX = (this.width - containerWidth) / 2;
+        int containerY = (this.height - containerHeight) / 2;
+
+        // Clip rendering to the container bounds
+        int minX = containerX;
+        int maxX = containerX + containerWidth;
+        int minY = containerY;
+        int maxY = containerY + containerHeight;
 
         // Adjust the hover box dimensions
         int adjustedX = x + 6; // Narrow the hover box by reducing 1 pixel from the left
-        int adjustedY = y - 22; // Move the top of the box higher
+        int adjustedY = y - 21; // Move the top of the box higher
         int entityWidth = (ENTITY_PREVIEW_SIZE * 2) - 12; // Reduce the width by 2 pixels
-        int entityHeight = ENTITY_SPACING -3 ; // Reduce the height to stop the bottom from going too low
+        int entityHeight = ENTITY_SPACING - 6; // Reduce the height to stop the bottom from going too low
+
+        // Ensure the variant preview stays within the container bounds
+        if (adjustedX + entityWidth > maxX || adjustedX < minX) return; // Skip rendering if out of bounds horizontally
+        if (adjustedY + entityHeight > maxY || adjustedY < minY) return; // Skip rendering if out of bounds vertically
+
+        // Render the entity preview
+        renderEntity(context.getMatrices(), x + ENTITY_PREVIEW_SIZE, y + (ENTITY_SPACING / 2), ENTITY_PREVIEW_SIZE, previewNPC, 145.0F);
 
         // Check if the mouse is hovering over this variant
         if (mouseX >= adjustedX && mouseX <= adjustedX + entityWidth

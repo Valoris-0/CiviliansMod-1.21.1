@@ -31,7 +31,7 @@ public class NPCEntity extends PathAwareEntity {
     private boolean isTurning = false; // Whether the NPC is currently in the process of turning
     private int lookAtPlayerTicks = 0;
     private static final TrackedData<Boolean> IS_PAUSED = DataTracker.registerData(NPCEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
-
+    private int regenerationCooldown = 0;
     public NPCEntity(EntityType<? extends PathAwareEntity> entityType, World world) {
         super(entityType, world);
 
@@ -135,7 +135,7 @@ public class NPCEntity extends PathAwareEntity {
     protected void initGoals() {
         super.initGoals();
         this.goalSelector.add(1, new WanderAroundFarGoal(this, 0.7));
-        this.goalSelector.add(3, new CustomDoorGoal(this));
+        this.goalSelector.add(5, new CustomDoorGoal(this));
         this.goalSelector.add(6, new LookAroundGoal(this));
     }
 
@@ -160,14 +160,14 @@ public class NPCEntity extends PathAwareEntity {
                         "Watch it pal, you don't know who you're messing with.",
                         "Ow!",
                         "GET AWAY FROM ME!",
-                        ";)",
                         "Why must this world cast unfortunate events upon me!",
                         "Hey...please stop I have already had a long day.",
                         "IF ONLY THERE WAS A HERO WHO COULD SAVE ME!",
                         "Lash your anger out on the sheep, not me!",
                         "I'm so sorry, I'm so sorry!",
                         "The prophecy foretold you would do this.",
-                        "Friends shouldn't hurt other friends!"
+                        "Friends shouldn't hurt other friends!",
+                        "@$%#&!!"
                 };
 
                 String hitDialogue = hitDialogues[this.random.nextInt(hitDialogues.length)];
@@ -311,8 +311,8 @@ public class NPCEntity extends PathAwareEntity {
                 float targetPitch = (float) -(Math.atan2(dy, distance) * (180.0 / Math.PI)); // Vertical rotation
 
                 // Smoothly adjust the headYaw and pitch towards the target
-                this.headYaw = adjustTowards(this.headYaw, targetYaw, 5.0F); // Max turn rate of 5 degrees per tick
-                this.setPitch(adjustTowards(this.getPitch(), targetPitch, 5.0F)); // Smooth pitch adjustment
+                this.headYaw = adjustTowards(this.headYaw, targetYaw); // Max turn rate of 5 degrees per tick
+                this.setPitch(adjustTowards(this.getPitch(), targetPitch)); // Smooth pitch adjustment
             }
             return; // Skip additional logic while paused
         }
@@ -330,15 +330,24 @@ public class NPCEntity extends PathAwareEntity {
             this.getNavigation().stop(); // Ensure NPC does not move while focusing
             this.setVelocity(0.0, 0.0, 0.0);
         }
+
+        if (this.isAlive() && this.getHealth() < this.getMaxHealth()) {
+            if (regenerationCooldown <= 0) {
+                this.heal(1.0F); // Regenerate 1 health every cooldown reset.
+                regenerationCooldown = 20; // Reset cooldown (20 ticks = 1 second).
+            } else {
+                regenerationCooldown--; // Decrease regeneration cooldown every tick.
+            }
+        }
     }
 
     // Smoothly adjust the current angle towards a target angle
-    private float adjustTowards(float current, float target, float maxIncrease) {
+    private float adjustTowards(float current, float target) {
         float delta = MathHelper.wrapDegrees(target - current);
-        if (delta > maxIncrease) {
-            delta = maxIncrease; // Cap the increase
-        } else if (delta < -maxIncrease) {
-            delta = -maxIncrease; // Cap the decrease
+        if (delta > (float) 5.0) {
+            delta = (float) 5.0; // Cap the increase
+        } else if (delta < -(float) 5.0) {
+            delta = -(float) 5.0; // Cap the decrease
         }
         return current + delta; // Adjust current angle
     }

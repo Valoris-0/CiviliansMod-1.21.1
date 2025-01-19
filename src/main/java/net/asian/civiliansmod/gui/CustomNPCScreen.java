@@ -35,7 +35,6 @@ public class CustomNPCScreen extends Screen {
     private final int originalVariant;
     private int scrollbarGrabOffset = 0;
     private boolean isDefaultTab = true;
-    private ButtonWidget pauseButton; // Reference to the pause button
     private TextFieldWidget nameInputField;
 
     public CustomNPCScreen(NPCEntity npc) {
@@ -53,9 +52,7 @@ public class CustomNPCScreen extends Screen {
 
     private void updateScrollBarDimensions() {
         // Container dimensions
-        int containerWidth = 256;
         int containerHeight = 166;
-        int containerX = (this.width - containerWidth) / 2;
         int containerY = (this.height - containerHeight) / 2;
 
         // Total rows and visible rows calculation
@@ -66,10 +63,9 @@ public class CustomNPCScreen extends Screen {
 
         // Scroll bar total height based on the container
         int scrollBarTotalHeight = containerHeight - 55; // Leave padding inside the container
-        float visiblePercentage = (float) visibleRows / totalRows;
 
         // Scroll bar handle height and vertical position calculation
-        this.scrollbarHeight = Math.max((int) (visiblePercentage * scrollBarTotalHeight), 15);
+        this.scrollbarHeight = 15;
         this.scrollbarY = containerY + 40 + (int) ((float) this.scrollOffset / this.maxScrollOffset * (scrollBarTotalHeight - this.scrollbarHeight));
     }
 
@@ -104,11 +100,7 @@ public class CustomNPCScreen extends Screen {
         // Render center preview and variants
         renderCenterPreview(context, mouseX, mouseY);
 
-        if (isDefaultTab) {
-            renderVariants(context, mouseX, mouseY, delta, true, scrollOffset, this.width / 2 - COLUMN_WIDTH - 50);
-        } else {
-            renderVariants(context, mouseX, mouseY, delta, false, scrollOffset, this.width / 2 + 50);
-        }
+        renderVariants(context, mouseX, mouseY, delta, isDefaultTab, scrollOffset);
 
         // Render the scroll bar
         renderVanillaScrollBar(context);
@@ -152,7 +144,7 @@ public class CustomNPCScreen extends Screen {
                 containerX + 5, containerY + 28, 62, 14, Text.literal("Enter NPC Name")
         );
 
-        this.pauseButton = ButtonWidget.builder(Text.literal(npc.isPaused() ? "Stay: On" : "Stay: Off"), button -> {
+        ButtonWidget pauseButton = ButtonWidget.builder(Text.literal(npc.isPaused() ? "Stay: On" : "Stay: Off"), button -> {
                     boolean newState = !npc.isPaused();
                     npc.setPaused(newState); // Update NPC's paused state
                     button.setMessage(Text.literal(newState ? "Stay: On" : "Stay: Off")); // Update button text
@@ -206,13 +198,11 @@ public class CustomNPCScreen extends Screen {
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
         // Container dimensions
         int containerWidth = 256;
-        int containerHeight = 166;
         int containerX = (this.width - containerWidth) / 2;
-        int containerY = (this.height - containerHeight) / 2;
 
         // Scroll bar position
         int scrollBarX = containerX + 70; // Match `renderVanillaScrollBar`
-        int scrollBarY = containerY + 40; // Match `renderVanillaScrollBar`
+        // Match `renderVanillaScrollBar`
 
         // Check if clicking within the scroll handle
         if (mouseX >= scrollBarX && mouseX <= scrollBarX + 6 && mouseY >= this.scrollbarY && mouseY <= this.scrollbarY + this.scrollbarHeight) {
@@ -244,9 +234,7 @@ public class CustomNPCScreen extends Screen {
 
     private int detectClickedVariant(double mouseX, double mouseY, int panelX, boolean isDefaultTab) {
         // Container dimensions
-        int containerWidth = 255;
         int containerHeight = 166;
-        int containerX = (this.width - containerWidth) / 2;
         int containerY = (this.height - containerHeight) / 2;
 
         // Starting variant index based on the active tab
@@ -334,9 +322,7 @@ public class CustomNPCScreen extends Screen {
     public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
         if (this.isScrolling) {
 
-            int containerWidth = 256;
             int containerHeight = 166;
-            int containerX = (this.width - containerWidth) / 2;
             int containerY = (this.height - containerHeight) / 2;
 
             // Scroll bar position and height
@@ -369,7 +355,7 @@ public class CustomNPCScreen extends Screen {
         return super.mouseReleased(mouseX, mouseY, button);
     }
 
-    private void renderVariants(DrawContext context, int mouseX, int mouseY, float ignoredDelta, boolean isDefault, int scrollOffset, int panelX) {
+    private void renderVariants(DrawContext context, int mouseX, int mouseY, float ignoredDelta, boolean isDefault, int scrollOffset) {
         // Container dimensions
         int containerWidth = 256;
         int containerHeight = 166;
@@ -380,7 +366,7 @@ public class CustomNPCScreen extends Screen {
         int startY = containerY + 59;
 
 
-        panelX = containerX + 78; // Position Default tab models within the container
+        int panelX = containerX + 78; // Position Default tab models within the container
 
         // Adjust spacing for columns for better alignment
         int columnWidth = (COLUMN_WIDTH / 3) - 10; // Reduced width to bring columns closer
@@ -418,9 +404,7 @@ public class CustomNPCScreen extends Screen {
         int containerY = (this.height - containerHeight) / 2;
 
         // Clip rendering to the container bounds
-        int minX = containerX;
         int maxX = containerX + containerWidth;
-        int minY = containerY;
         int maxY = containerY + containerHeight;
 
         // Adjust the hover box dimensions
@@ -430,8 +414,8 @@ public class CustomNPCScreen extends Screen {
         int entityHeight = ENTITY_SPACING - 6; // Reduce the height to stop the bottom from going too low
 
         // Ensure the variant preview stays within the container bounds
-        if (adjustedX + entityWidth > maxX || adjustedX < minX) return; // Skip rendering if out of bounds horizontally
-        if (adjustedY + entityHeight > maxY || adjustedY < minY) return; // Skip rendering if out of bounds vertically
+        if (adjustedX + entityWidth > maxX || adjustedX < containerX) return; // Skip rendering if out of bounds horizontally
+        if (adjustedY + entityHeight > maxY || adjustedY < containerY) return; // Skip rendering if out of bounds vertically
 
         // Render the entity preview
         renderEntity(context.getMatrices(), x + ENTITY_PREVIEW_SIZE, y + (ENTITY_SPACING / 2), ENTITY_PREVIEW_SIZE, previewNPC, 145.0F);

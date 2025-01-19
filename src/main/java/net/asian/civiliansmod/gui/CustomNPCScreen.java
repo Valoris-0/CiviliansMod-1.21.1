@@ -35,7 +35,7 @@ public class CustomNPCScreen extends Screen {
     private final int originalVariant;
     private int scrollbarGrabOffset = 0;
     private boolean isDefaultTab = true;
-
+    private ButtonWidget pauseButton; // Reference to the pause button
     private TextFieldWidget nameInputField;
 
     public CustomNPCScreen(NPCEntity npc) {
@@ -46,6 +46,10 @@ public class CustomNPCScreen extends Screen {
         this.selectedVariant = -1; // No new skin is selected yet
     }
 
+    @Override
+    public boolean shouldPause() {
+        return false;
+    }
 
     private void updateScrollBarDimensions() {
         // Container dimensions
@@ -147,6 +151,15 @@ public class CustomNPCScreen extends Screen {
                 this.textRenderer,
                 containerX + 5, containerY + 28, 62, 14, Text.literal("Enter NPC Name")
         );
+
+        this.pauseButton = ButtonWidget.builder(Text.literal(npc.isPaused() ? "Stay: On" : "Stay: Off"), button -> {
+                    boolean newState = !npc.isPaused();
+                    npc.setPaused(newState); // Update NPC's paused state
+                    button.setMessage(Text.literal(newState ? "Stay: On" : "Stay: Off")); // Update button text
+                }).dimensions(containerX + 202, containerY + containerHeight - 129, 49, 20) // Adjust position and size
+                .build();
+
+        this.addDrawableChild(pauseButton); // Add button to the screen
         this.nameInputField.setText(currentName); // Pre-fill the text field with the NPC's current name
         this.nameInputField.setMaxLength(32); // Limit to 32 characters
         this.addSelectableChild(this.nameInputField);
@@ -164,13 +177,13 @@ public class CustomNPCScreen extends Screen {
     @Override
     public void close() {
         if (MinecraftClient.getInstance().player != null) {
-
             NPCDataPayload payload = new NPCDataPayload(
                     npc.getUuid(),
                     nameInputField.getText(),
-                    npc.getVariant()
+                    npc.getVariant(),
+                    npc.isPaused() // Add paused state
             );
-            ClientPlayNetworking.send(payload);
+            ClientPlayNetworking.send(payload); // Send data to the server
         }
         super.close();
     }

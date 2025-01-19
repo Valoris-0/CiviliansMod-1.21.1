@@ -2,6 +2,7 @@ package net.asian.civiliansmod.entity;
 
 import net.asian.civiliansmod.entity.goal.CustomDoorGoal;
 import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.WanderAroundFarGoal;
 import net.minecraft.entity.attribute.DefaultAttributeContainer;
 import net.minecraft.entity.attribute.EntityAttributes;
@@ -17,26 +18,27 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.asian.civiliansmod.gui.CustomNPCScreen;
 import net.minecraft.client.MinecraftClient;
 
 public class NPCEntity extends PathAwareEntity {
-    // DataTracker key for the variant
-    private static final TrackedData<Integer> VARIANT = DataTracker.registerData(NPCEntity.class,
-            TrackedDataHandlerRegistry.INTEGER);
+
+    private static final TrackedData<Integer> VARIANT = DataTracker.registerData(NPCEntity.class,TrackedDataHandlerRegistry.INTEGER);
     private float targetYaw = 0.0F; // The yaw to smoothly rotate towards
     private boolean isTurning = false; // Whether the NPC is currently in the process of turning
     private int lookAtPlayerTicks = 0;
+    private static final TrackedData<Boolean> IS_PAUSED = DataTracker.registerData(NPCEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
 
     public NPCEntity(EntityType<? extends PathAwareEntity> entityType, World world) {
         super(entityType, world);
 
-        if (!this.getWorld().isClient) { // Server-side variant assignment
-            // Randomly assign the variant (0–2 = default, 3–5 = slim)
+        if (!this.getWorld().isClient) {
+
             int variant = this.random.nextInt(88);
-            this.setVariant(variant); // Update DataTracker value with assigned variant
+            this.setVariant(variant);
 
             // Assign default model and slim model names to the entity
             String[] defaultModelNames = { "Charles", "Cade", "Henry", "Liam", "Rodney", "Nathaniel", "Elliot", "Julian", "Malcolm", "Tobias",
@@ -62,7 +64,8 @@ public class NPCEntity extends PathAwareEntity {
     @Override
     protected void initDataTracker(DataTracker.Builder builder) {
         super.initDataTracker(builder);
-        builder.add(VARIANT, 0); // Default initialized to variant 0
+        builder.add(VARIANT, 0);
+        builder.add(IS_PAUSED, false);
     }
 
     // Getter for the variant
@@ -89,13 +92,23 @@ public class NPCEntity extends PathAwareEntity {
     public boolean cannotDespawn() {
         return true;
     }
+
+    public boolean isPaused() {
+        return this.dataTracker.get(IS_PAUSED);
+    }
+
+    public void setPaused(boolean paused) {
+        this.dataTracker.set(IS_PAUSED, paused);
+    }
+
     @Override
     public void writeCustomDataToNbt(NbtCompound nbt) {
         super.writeCustomDataToNbt(nbt);
 
         // Save the variant to NBT
         nbt.putInt("Variant", this.getVariant());
-        // Save the custom name to NBT
+        nbt.putBoolean("IsPaused", this.isPaused());
+
 
     }
 
@@ -105,6 +118,9 @@ public class NPCEntity extends PathAwareEntity {
         if (nbt.contains("Variant")) {
             this.setVariant(nbt.getInt("Variant")); // Load custom variant from NBT
 
+        }
+        if (nbt.contains("IsPaused")) {
+            this.setPaused(nbt.getBoolean("IsPaused")); // Load paused state
         }
 
     }
@@ -118,11 +134,9 @@ public class NPCEntity extends PathAwareEntity {
     @Override
     protected void initGoals() {
         super.initGoals();
-
-        this.goalSelector.add(3, new CustomDoorGoal(this));
-
         this.goalSelector.add(1, new WanderAroundFarGoal(this, 0.7));
-
+        this.goalSelector.add(3, new CustomDoorGoal(this));
+        this.goalSelector.add(6, new LookAroundGoal(this));
     }
 
     @Override
@@ -278,19 +292,55 @@ public class NPCEntity extends PathAwareEntity {
 
     @Override
     public void tickMovement() {
+        if (isPaused()) {
+            // Ensure NPC does not move while paused
+            this.getNavigation().stop();
+            this.setVelocity(0.0, 0.0, 0.0);
+
+            // Make the NPC look at the nearest player within 10 blocks
+            PlayerEntity nearestPlayer = this.getWorld().getClosestPlayer(this, 5.0);
+            if (nearestPlayer != null) {
+                // Calculate the direction to look at the player
+                double dx = nearestPlayer.getX() - this.getX();
+                double dy = nearestPlayer.getEyeY() - this.getEyeY(); // Adjust for eye level
+                double dz = nearestPlayer.getZ() - this.getZ();
+                double distance = Math.sqrt(dx * dx + dz * dz);
+
+                // Calculate yaw and pitch for the NPC to face the player
+                float targetYaw = (float) (Math.atan2(dz, dx) * (180.0 / Math.PI)) - 90.0F; // Horizontal rotation
+                float targetPitch = (float) -(Math.atan2(dy, distance) * (180.0 / Math.PI)); // Vertical rotation
+
+                // Smoothly adjust the headYaw and pitch towards the target
+                this.headYaw = adjustTowards(this.headYaw, targetYaw, 5.0F); // Max turn rate of 5 degrees per tick
+                this.setPitch(adjustTowards(this.getPitch(), targetPitch, 5.0F)); // Smooth pitch adjustment
+            }
+            return; // Skip additional logic while paused
+        }
+
         super.tickMovement();
 
         // Handle smooth turning (called every tick)
         if (isTurning) {
             smoothTurnToTargetYaw();
         }
-        if (this.lookAtPlayerTicks > 0) {
-            this.lookAtPlayerTicks--; // Countdown
 
-            // Ensure the NPC remains stationary and focused while looking at the player
-            this.getNavigation().stop();
+        // Countdown for "lookAtPlayerTicks" behavior
+        if (this.lookAtPlayerTicks > 0) {
+            this.lookAtPlayerTicks--; // Decrease look timer
+            this.getNavigation().stop(); // Ensure NPC does not move while focusing
             this.setVelocity(0.0, 0.0, 0.0);
         }
+    }
+
+    // Smoothly adjust the current angle towards a target angle
+    private float adjustTowards(float current, float target, float maxIncrease) {
+        float delta = MathHelper.wrapDegrees(target - current);
+        if (delta > maxIncrease) {
+            delta = maxIncrease; // Cap the increase
+        } else if (delta < -maxIncrease) {
+            delta = -maxIncrease; // Cap the decrease
+        }
+        return current + delta; // Adjust current angle
     }
 
     private void smoothTurnToTargetYaw() {

@@ -36,6 +36,9 @@ public class CustomNPCScreen extends Screen {
     private int scrollbarGrabOffset = 0;
     private boolean isDefaultTab = true;
     private TextFieldWidget nameInputField;
+    private boolean isCustomTab = false;
+    private ButtonWidget upslimButton;
+    private ButtonWidget updefaultButton;
 
     public CustomNPCScreen(NPCEntity npc) {
 
@@ -108,7 +111,9 @@ public class CustomNPCScreen extends Screen {
         // Render the name input field
         this.nameInputField.render(context, mouseX, mouseY, delta);
 
-        // Render the buttons last to bring them to the front
+        this.upslimButton.visible = isCustomTab;
+        this.updefaultButton.visible = isCustomTab;
+
         for (var button : this.children()) {
             if (button instanceof ButtonWidget) {
                 ((ButtonWidget) button).render(context, mouseX, mouseY, delta);
@@ -126,6 +131,7 @@ public class CustomNPCScreen extends Screen {
 
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Default"), button -> {
             isDefaultTab = true;
+            isCustomTab = false;
             scrollOffset = 0;
             updateScrollBarDimensions();
         }).dimensions(containerX + 82, containerY + 22, 39, 12).build());
@@ -133,11 +139,14 @@ public class CustomNPCScreen extends Screen {
         // Add Slim tab button
         this.addDrawableChild(ButtonWidget.builder(Text.literal("Slim"), button -> {
             isDefaultTab = false;
+            isCustomTab = false;
             scrollOffset = 0;
             updateScrollBarDimensions();
         }).dimensions(containerX + 121, containerY + 22, 40, 12).build());
 
-        this.addDrawableChild(ButtonWidget.builder(Text.literal("Custom (Coming Soon)"), button -> {
+        this.addDrawableChild(ButtonWidget.builder(Text.literal("Custom"), button -> {
+            isDefaultTab = false;
+            isCustomTab = true; // Activate the Custom tab
             scrollOffset = 0;
             updateScrollBarDimensions();
         }).dimensions(containerX + 161, containerY + 22, 39, 12).build());
@@ -147,6 +156,15 @@ public class CustomNPCScreen extends Screen {
             scrollOffset = 0;
             updateScrollBarDimensions();
         }).dimensions(containerX + 11, containerY + 136, 50, 14).build());
+
+        this.upslimButton = ButtonWidget.builder(Text.literal("↑Slim"), button -> {
+            // Add action if needed
+        }).dimensions(containerX + 202, containerY + containerHeight - 37, 49, 20).build();
+        this.addDrawableChild(upslimButton);
+
+        this.updefaultButton = ButtonWidget.builder(Text.literal("↑Default"), button -> {
+        }).dimensions(containerX + 202, containerY + containerHeight - 66, 49, 20).build();
+        this.addDrawableChild(updefaultButton);
 
         String currentName = npc.getCustomName() != null ? npc.getCustomName().getString() : ""; // Use NPC's current name or empty string
         this.nameInputField = new TextFieldWidget(
@@ -159,7 +177,7 @@ public class CustomNPCScreen extends Screen {
                     boolean newState = !npc.isPaused();
                     npc.setPaused(newState); // Update NPC's paused state
                     button.setMessage(Text.literal(newState ? "Stay: On" : "Stay: Off")); // Update button text
-                }).dimensions(containerX + 202, containerY + containerHeight - 129, 49, 20) // Adjust position and size
+                }).dimensions(containerX + 202, containerY + containerHeight - 124, 49, 20) // Adjust position and size
                 .build();
         this.addDrawableChild(pauseButton); // Add button to the screen
 
@@ -233,8 +251,11 @@ public class CustomNPCScreen extends Screen {
             this.scrollbarGrabOffset = (int) (mouseY - this.scrollbarY);
             return true;
         }
+        if (isCustomTab) {
 
-        // Check if a model is clicked
+            return super.mouseClicked(mouseX, mouseY, button);
+        }
+
         if (button == 0) { // Left mouse button
             int panelX = isDefaultTab ? (containerX + 10) : (containerX + COLUMN_WIDTH + 30);
 
@@ -385,6 +406,10 @@ public class CustomNPCScreen extends Screen {
 
     private void renderVariants(DrawContext context, int mouseX, int mouseY, float ignoredDelta, boolean isDefault, int scrollOffset) {
         // Container dimensions
+        if (isCustomTab) {
+            return;
+        }
+
         int containerWidth = 256;
         int containerHeight = 166;
         int containerX = (this.width - containerWidth) / 2;

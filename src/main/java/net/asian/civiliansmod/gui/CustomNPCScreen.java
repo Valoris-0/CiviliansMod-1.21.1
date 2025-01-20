@@ -18,6 +18,7 @@ import net.minecraft.world.World;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.mob.PathAwareEntity;
 import net.minecraft.entity.Entity;
+import net.asian.civiliansmod.custom_skins.SkinFolderManager;
 
 public class CustomNPCScreen extends Screen {
     private final NPCEntity npc;
@@ -158,11 +159,12 @@ public class CustomNPCScreen extends Screen {
         }).dimensions(containerX + 11, containerY + 136, 50, 14).build());
 
         this.upslimButton = ButtonWidget.builder(Text.literal("↑Slim"), button -> {
-            // Add action if needed
+            SkinFolderManager.openFolder("slim");
         }).dimensions(containerX + 202, containerY + containerHeight - 37, 49, 20).build();
         this.addDrawableChild(upslimButton);
 
         this.updefaultButton = ButtonWidget.builder(Text.literal("↑Default"), button -> {
+            SkinFolderManager.openFolder("default");
         }).dimensions(containerX + 202, containerY + containerHeight - 66, 49, 20).build();
         this.addDrawableChild(updefaultButton);
 

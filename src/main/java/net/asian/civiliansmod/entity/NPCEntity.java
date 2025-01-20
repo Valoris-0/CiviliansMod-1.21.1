@@ -18,6 +18,7 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
@@ -33,6 +34,7 @@ public class NPCEntity extends PathAwareEntity {
     private static final TrackedData<Boolean> IS_PAUSED = DataTracker.registerData(NPCEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
     private int regenerationCooldown = 0;
     private static final TrackedData<Boolean> IS_FOLLOWING = DataTracker.registerData(NPCEntity.class, TrackedDataHandlerRegistry.BOOLEAN);
+
 
     public NPCEntity(EntityType<? extends PathAwareEntity> entityType, World world) {
         super(entityType, world);
@@ -136,6 +138,7 @@ public class NPCEntity extends PathAwareEntity {
         if (nbt.contains("IsFollowing")) {
             this.setFollowing(nbt.getBoolean("IsFollowing"));
         }
+
     }
 
     public static DefaultAttributeContainer.Builder createAttributes() {

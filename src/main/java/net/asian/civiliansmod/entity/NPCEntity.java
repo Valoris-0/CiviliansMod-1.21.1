@@ -1,6 +1,8 @@
 package net.asian.civiliansmod.entity;
 
 import net.asian.civiliansmod.entity.goal.CustomDoorGoal;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ai.goal.LookAroundGoal;
 import net.minecraft.entity.ai.goal.WanderAroundFarGoal;
@@ -239,7 +241,7 @@ public class NPCEntity extends PathAwareEntity {
                     return ActionResult.SUCCESS;
                 } else {
                     // Open the GUI on the client side
-                    MinecraftClient.getInstance().setScreen(new CustomNPCScreen(this));
+                    openCustomNPCScreen();
                 }
                 return ActionResult.SUCCESS; // Indicate the interaction was handled
             }
@@ -296,6 +298,11 @@ public class NPCEntity extends PathAwareEntity {
         // Delegate to superclass for other interactions
         return super.interactMob(player, hand);
     }
+    @Environment(EnvType.CLIENT)
+    private void openCustomNPCScreen() {
+        MinecraftClient.getInstance().setScreen(new CustomNPCScreen(this));
+    }
+
     @Override
     public Vec3d getLeashOffset() {
         // Adjusted offset to attach the leash to the NPC's hips

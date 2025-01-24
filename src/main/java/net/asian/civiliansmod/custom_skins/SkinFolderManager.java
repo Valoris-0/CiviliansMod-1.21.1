@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class SkinFolderManager {
@@ -12,10 +13,10 @@ public class SkinFolderManager {
 
 
     public static void ensureFolderExists(String subFolderName) {
-        // Get the `.minecraft` folder
+
         File baseFolder = new File(MinecraftClient.getInstance().runDirectory, BASE_FOLDER_NAME);
 
-        // Create the base folder if it doesn't exist
+
         if (!baseFolder.exists()) {
             baseFolder.mkdirs();
         }
@@ -36,9 +37,7 @@ public class SkinFolderManager {
         List<File> skinFileList = new ArrayList<>();
 
         if (skinFiles != null) {
-            for (File file : skinFiles) {
-                skinFileList.add(file);
-            }
+            Collections.addAll(skinFileList, skinFiles);
         }
 
         return skinFileList;

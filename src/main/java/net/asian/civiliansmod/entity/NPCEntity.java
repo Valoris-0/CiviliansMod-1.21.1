@@ -351,7 +351,8 @@ public class NPCEntity extends PathAwareEntity {
                 // Check the distance and adjust behavior dynamically
                 if (distanceToPlayer > 4.0 && distanceToPlayer < 400.0) { // Follow if distance > 2 blocks but < 20 blocks
                     double deltaX = nearestPlayer.getX() - this.getX();
-                    double deltaY = nearestPlayer.getEyeY() - this.getEyeY();
+                    nearestPlayer.getEyeY();
+                    this.getEyeY();
                     double deltaZ = nearestPlayer.getZ() - this.getZ();
 
                     // Dynamically adjust the speed based on distance (faster speed if farther away)

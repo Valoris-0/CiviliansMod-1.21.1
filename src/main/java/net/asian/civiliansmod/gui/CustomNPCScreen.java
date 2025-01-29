@@ -159,13 +159,13 @@ public class CustomNPCScreen extends Screen {
         }).dimensions(containerX + 11, containerY + 136, 50, 14).build());
 
         this.upslimButton = ButtonWidget.builder(Text.literal("↑Slim"), button ->
-                SkinFolderManager.openFolder("slim")).dimensions
-                (containerX + 202, containerY + containerHeight - 37, 49, 20).build();
+                        SkinFolderManager.openFolder("slim")) // Pass "slim", not "civiliansmod_skins_slim"
+                .dimensions(containerX + 202, containerY + containerHeight - 37, 49, 20).build();
         this.addDrawableChild(upslimButton);
 
         this.updefaultButton = ButtonWidget.builder(Text.literal("↑Default"), button ->
-                SkinFolderManager.openFolder("default")).dimensions
-                (containerX + 202, containerY + containerHeight - 66, 49, 20).build();
+                        SkinFolderManager.openFolder("default")) // Pass "default", not "civiliansmod_skins_default"
+                .dimensions(containerX + 202, containerY + containerHeight - 66, 49, 20).build();
         this.addDrawableChild(updefaultButton);
 
         String currentName = npc.getCustomName() != null ? npc.getCustomName().getString() : ""; // Use NPC's current name or empty string

@@ -125,6 +125,8 @@ public class NPCEntity extends PathAwareEntity {
         nbt.putBoolean("IsPaused", this.isPaused());
         nbt.putBoolean("IsFollowing", this.isFollowing());
 
+        // Save custom skins
+        SkinFolderManager.saveCustomSkinsToNbt(nbt);
     }
 
     @Override
@@ -141,6 +143,8 @@ public class NPCEntity extends PathAwareEntity {
             this.setFollowing(nbt.getBoolean("IsFollowing"));
         }
 
+        // Load custom skins
+        SkinFolderManager.loadCustomSkinsFromNbt(nbt);
     }
 
     public static DefaultAttributeContainer.Builder createAttributes() {

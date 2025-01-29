@@ -1,8 +1,10 @@
 package net.asian.civiliansmod.custom_skins;
 
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.nbt.NbtCompound;
 import java.io.File;
 import java.io.IOException;
+
 public class SkinFolderManager {
 
     private static final String BASE_FOLDER_NAME_1 = "civiliansmod_skins_default";
@@ -32,6 +34,19 @@ public class SkinFolderManager {
         }
     }
 
+    public static int getCustomSkinCount() {
+        // Return the number of custom skins available
+        // Implement logic to count custom skins in the folder
+        return 0; // Placeholder
+    }
+
+    public static void saveCustomSkinsToNbt(NbtCompound nbt) {
+        // Implement logic to save custom skins to NBT
+    }
+
+    public static void loadCustomSkinsFromNbt(NbtCompound nbt) {
+        // Implement logic to load custom skins from NBT
+    }
 
     public static void openFolder(String subFolderName) {
         // Determine the base folder name based on the subFolderName

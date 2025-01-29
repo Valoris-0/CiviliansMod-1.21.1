@@ -35,8 +35,16 @@ public class NPCRenderer extends MobEntityRenderer<NPCEntity, NPCModel<NPCEntity
     @Override
     public Identifier getTexture(NPCEntity entity) {
         int variant = entity.getVariant();
+        String textureType;
 
-        String textureType = variant < 44 ? "default" : "slim";
+        if (variant < 44) {
+            textureType = "default";
+        } else if (variant < 88) {
+            textureType = "slim";
+        } else {
+            textureType = "custom";
+        }
+
         return Identifier.of("civiliansmod", "textures/entity/npc/" + textureType + "/"
                 + textureType + "_" + (variant % 44) + ".png");
     }

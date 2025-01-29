@@ -106,6 +106,11 @@ public class CustomNPCScreen extends Screen {
 
         renderVariants(context, mouseX, mouseY, delta, isDefaultTab, scrollOffset);
 
+        // Render custom skins if the custom tab is active
+        if (isCustomTab) {
+            renderCustomSkins(context, mouseX, mouseY, delta, scrollOffset);
+        }
+
         // Render the scroll bar
         renderVanillaScrollBar(context);
 
@@ -254,6 +259,17 @@ public class CustomNPCScreen extends Screen {
             return true;
         }
         if (isCustomTab) {
+            int panelX = containerX + 77; // Position custom tab models within the container
+
+            // Detect which variant is clicked based on the custom tab
+            int clickedVariant = detectClickedVariant(mouseX, mouseY, panelX, false);
+
+            if (clickedVariant != -1) {
+                this.selectedVariant = clickedVariant;
+                this.npc.setVariant(clickedVariant); // Update NPC variant immediately
+
+                npc.writeCustomDataToNbt(npc.writeNbt(new NbtCompound())); // Save changes to ensure they persist
+            }
 
             return super.mouseClicked(mouseX, mouseY, button);
         }
@@ -430,6 +446,43 @@ public class CustomNPCScreen extends Screen {
         // Render variants in the correct range
         int startVariantIndex = isDefault ? 0 : 44;
         int endVariantIndex = isDefault ? 43 : 87;
+
+        for (int i = startVariantIndex; i <= endVariantIndex; i++) {
+            // Compute the row and column positions for each variant
+            int rowIndex = (i - startVariantIndex) / 3; // Divide into groups of 3 per row
+            int columnIndex = (i - startVariantIndex) % 3; // Determine which column the model is in
+            int xPosition = panelX + columnIndex * (columnWidth + columnOffset); // Adjust horizontal position
+            int yPosition = startY + rowIndex * ENTITY_SPACING - scrollOffset; // Adjust vertical position
+
+            // Skip rows that are completely out of container bounds
+            if (yPosition + ENTITY_SPACING < containerY || yPosition > containerY + containerHeight) {
+                continue; // Don't render if the row is invisible
+            }
+
+            // Render the model for the current variant
+            renderVariantPreview(context, xPosition, yPosition, i, mouseX, mouseY);
+        }
+    }
+
+    private void renderCustomSkins(DrawContext context, int mouseX, int mouseY, float delta, int scrollOffset) {
+        // Container dimensions
+        int containerWidth = 256;
+        int containerHeight = 166;
+        int containerX = (this.width - containerWidth) / 2;
+        int containerY = (this.height - containerHeight) / 2;
+
+        // Initial Y position relative to the container
+        int startY = containerY + 61;
+
+        int panelX = containerX + 77; // Position custom tab models within the container
+
+        // Adjust spacing for columns for better alignment
+        int columnWidth = (COLUMN_WIDTH / 3) - 10; // Reduced width to bring columns closer
+        int columnOffset = 6; // Fine-tune additional space between columns
+
+        // Render custom skins
+        int startVariantIndex = 88; // Custom skins start from variant 88
+        int endVariantIndex = startVariantIndex + SkinFolderManager.getCustomSkinCount() - 1;
 
         for (int i = startVariantIndex; i <= endVariantIndex; i++) {
             // Compute the row and column positions for each variant

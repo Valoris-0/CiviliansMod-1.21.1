@@ -42,8 +42,7 @@ public class NPCEntity extends PathAwareEntity {
         super(entityType, world);
 
         if (!this.getWorld().isClient) {
-
-            int variant = this.random.nextInt(88);
+            int variant = this.random.nextInt(88 + SkinFolderManager.getCustomSkinCount());
             this.setVariant(variant);
 
             // Assign default model and slim model names to the entity

@@ -2,6 +2,7 @@ package net.asian.civiliansmod.custom_skins;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.Identifier;
 import java.io.File;
 import java.io.IOException;
 
@@ -35,9 +36,9 @@ public class SkinFolderManager {
     }
 
     public static int getCustomSkinCount() {
-        // Return the number of custom skins available
-        // Implement logic to count custom skins in the folder
-        return 0; // Placeholder
+        File customSkinsFolder = new File(MinecraftClient.getInstance().runDirectory, "civiliansmod_skins_custom");
+        File[] customSkinFiles = customSkinsFolder.listFiles((dir, name) -> name.endsWith(".png"));
+        return customSkinFiles != null ? customSkinFiles.length : 0;
     }
 
     public static void saveCustomSkinsToNbt(NbtCompound nbt) {
@@ -70,5 +71,22 @@ public class SkinFolderManager {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static Identifier getCustomSkinTexture(int variant) {
+        File customSkinFile = getCustomSkinFile(variant);
+        if (customSkinFile != null && customSkinFile.exists()) {
+            return new Identifier("civiliansmod", "textures/entity/npc/custom/" + customSkinFile.getName());
+        }
+        return Identifier.of("civiliansmod", "textures/entity/npc/default/default_0.png"); // Fallback texture
+    }
+
+    private static File getCustomSkinFile(int variant) {
+        File customSkinsFolder = new File(MinecraftClient.getInstance().runDirectory, "civiliansmod_skins_custom");
+        File[] customSkinFiles = customSkinsFolder.listFiles((dir, name) -> name.endsWith(".png"));
+        if (customSkinFiles != null && variant >= 88 && variant < 88 + customSkinFiles.length) {
+            return customSkinFiles[variant - 88];
+        }
+        return null;
     }
 }

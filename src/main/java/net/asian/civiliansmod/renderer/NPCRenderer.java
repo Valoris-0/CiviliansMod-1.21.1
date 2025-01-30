@@ -44,6 +44,10 @@ public class NPCRenderer extends MobEntityRenderer<NPCEntity, NPCModel<NPCEntity
         } else {
             textureType = "custom";
         }
+ 
+        if (variant >= 88) {
+            return SkinFolderManager.getCustomSkinTexture(variant);
+        }
 
         return Identifier.of("civiliansmod", "textures/entity/npc/" + textureType + "/"
                 + textureType + "_" + (variant % 44) + ".png");

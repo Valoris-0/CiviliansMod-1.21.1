@@ -301,6 +301,11 @@ public class CustomNPCScreen extends Screen {
         int startVariantIndex = isDefaultTab ? 0 : 44;
         int endVariantIndex = isDefaultTab ? 43 : 87;
 
+        if (isCustomTab) {
+            startVariantIndex = 88;
+            endVariantIndex = startVariantIndex + SkinFolderManager.getCustomSkinCount() - 1;
+        }
+
         int startY = containerY + 39; // Matches where variants start rendering
 
         // Column setup
